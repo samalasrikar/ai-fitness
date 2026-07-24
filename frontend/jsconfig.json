@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@features/*": ["src/features/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@layout/*": ["src/layout/*"],
+      "@lib/*": ["src/lib/*"],
+      "@providers/*": ["src/providers/*"],
+      "@router/*": ["src/router/*"],
+      "@store/*": ["src/store/*"],
+      "@types/*": ["src/types/*"],
+      "@utils/*": ["src/utils/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}
