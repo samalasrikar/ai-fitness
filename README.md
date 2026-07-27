@@ -161,4 +161,4 @@ FitAI X follows:
 
 ## License
 
-MIT © FitAI X
+FitAI X
