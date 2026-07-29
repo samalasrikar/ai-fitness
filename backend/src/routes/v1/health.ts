@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { ApiResponse } from '../../utils/ApiResponse';
-import { prisma } from '../../config/prisma';
+import { db } from '../../config/database';
 
 const router = Router();
 
@@ -11,7 +11,7 @@ const router = Router();
 router.get('/', async (_req: Request, res: Response) => {
   let dbStatus = 'disconnected';
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await db.query('SELECT 1');
     dbStatus = 'connected';
   } catch {
     dbStatus = 'error';

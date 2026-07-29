@@ -1,2 +1,6 @@
-// Placeholder barrel export for module
-export {};
+export * from './auth.types';
+export * from './auth.repository';
+export * from './auth.service';
+export * from './auth.controller';
+export * from './auth.middleware';
+export * from './auth.routes';

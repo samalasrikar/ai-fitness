@@ -2,8 +2,7 @@ import http from 'http';
 import { createApp } from './app';
 import { env } from './env';
 import { logger } from './config/logger';
-import { prisma } from './config/prisma';
-import { checkDatabaseConnection } from './config/database';
+import { checkDatabaseConnection, disconnectDatabase } from './config/database';
 import { initializeSocket } from './config/socket';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -41,7 +40,7 @@ async function bootstrap(): Promise<void> {
       httpServer.close(async () => {
         logger.info('HTTP server closed.');
 
-        await prisma.$disconnect();
+        await disconnectDatabase();
         logger.info('Database connection closed.');
 
         process.exit(0);
