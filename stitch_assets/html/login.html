@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitAI X | Elevate Your Performance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#554600",
+                    "inverse-on-surface": "#313030",
+                    "surface-variant": "#353534",
+                    "on-secondary": "#3b2f00",
+                    "tertiary-fixed-dim": "#ffba38",
+                    "primary-container": "#f5c400",
+                    "on-surface-variant": "#d1c5ab",
+                    "on-secondary-fixed": "#221b00",
+                    "primary-fixed-dim": "#f1c100",
+                    "tertiary": "#ffe2b9",
+                    "secondary-container": "#fad100",
+                    "on-error": "#690005",
+                    "error-container": "#93000a",
+                    "on-primary-container": "#685200",
+                    "background": "#0A0A0A",
+                    "on-surface": "#e5e2e1",
+                    "surface-tint": "#f1c100",
+                    "on-primary-fixed-variant": "#584400",
+                    "on-primary-fixed": "#241a00",
+                    "primary": "#ffe49c",
+                    "surface-container-high": "#2a2a2a",
+                    "secondary": "#fff0c4",
+                    "primary-fixed": "#ffe08b",
+                    "surface-container-highest": "#353534",
+                    "secondary-fixed-dim": "#e9c400",
+                    "outline": "#9a9078",
+                    "surface-bright": "#3a3939",
+                    "tertiary-fixed": "#ffdeac",
+                    "surface-container": "#201f1f",
+                    "on-secondary-container": "#6d5a00",
+                    "secondary-fixed": "#ffe171",
+                    "outline-variant": "#4e4632",
+                    "on-background": "#e5e2e1",
+                    "inverse-primary": "#745b00",
+                    "inverse-surface": "#e5e2e1",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#724e00",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-low": "#1c1b1b",
+                    "surface": "#131313",
+                    "surface-container-lowest": "#0e0e0e",
+                    "tertiary-container": "#ffbf4d",
+                    "on-primary": "#3d2f00",
+                    "surface-dim": "#131313",
+                    "on-tertiary-fixed-variant": "#604100",
+                    "on-tertiary-fixed": "#281900",
+                    "on-tertiary": "#432c00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "xxl": "48px",
+                    "gutter": "16px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "container-margin": "24px",
+                    "xxxl": "64px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": ["Manrope"],
+                    "label-caps": ["Manrope"],
+                    "data-lg": ["JetBrains Mono"],
+                    "headline-md": ["Manrope"],
+                    "display-lg": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "data-sm": ["JetBrains Mono"],
+                    "body-lg": ["Manrope"]
+            },
+            "fontSize": {
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "data-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "data-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #E5E2E1;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(22, 22, 22, 0.4);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .glass-stroke {
+            border: 1px solid transparent;
+            background-image: linear-gradient(rgba(22, 22, 22, 0.4), rgba(22, 22, 22, 0.4)), 
+                              linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 25px rgba(245, 196, 0, 0.15);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-float {
+            animation: floating 6s ease-in-out infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row font-body-md overflow-hidden">
+<!-- Hero Illustration Section (Left side on Desktop, Top on Mobile) -->
+<section class="relative w-full md:w-1/2 lg:w-3/5 h-64 md:h-screen overflow-hidden bg-background flex items-center justify-center">
+<!-- Animated Background Shader -->
+
+<div class="relative z-10 w-full h-full flex flex-col items-center justify-center p-xl">
+<!-- Hero Illustration Image -->
+<div class="relative w-full max-w-xl aspect-square animate-float">
+<div class="absolute inset-0 rounded-full bg-primary-container/10 blur-[120px]"></div>
+<div class="w-full h-full rounded-2xl glass-stroke overflow-hidden flex items-center justify-center p-lg">
+<img class="w-full h-full object-cover rounded-xl shadow-2xl" data-alt="A cinematic, high-definition 3D rendering of a futuristic fitness device with golden accents and glowing data streams. The subject is an ergonomic, minimalist piece of equipment set against a deep black, moody background with subtle atmospheric mist. High-key golden lighting highlights the precision edges and carbon fiber textures, reflecting a luxury performance aesthetic. Soft blue and gold data particles float in the air, creating a sense of advanced artificial intelligence integration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwo_xz6ZFReN1W_kDoru1JNnjpafuyhGM5rjzeFxJm6eIy379yo9ZwgMiA7JY4FFKBUpcfFp9Y08jJNPCAqXr4qxDcprCne8slrK_Y7vnq4RsPsMWkwZsnTtb1M30UpRfggoubGKM3aNFFpOm7re1VYgguVKtmTnO6sNZjLcSiqUxgiPHXP0afCkdY-5HLVOJtx70dbzgDSjFw5o2Qf5FKhPOCDi3aio2PdgfFPplRuLajW-t9ZL5sjA"/>
+</div>
+</div>
+<!-- Branding Overlay for Desktop -->
+<div class="hidden md:block absolute bottom-xxl left-xxl max-w-md">
+<h2 class="font-display-lg text-display-lg text-primary-fixed mb-md">FitAI X</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-sm">
+                    Where elite human performance meets hyper-intelligent analysis.
+                </p>
+</div>
+</div>
+</section>
+<!-- Login Form Section (Right side on Desktop, Bottom on Mobile) -->
+<section class="flex-1 w-full md:w-1/2 lg:w-2/5 h-full min-h-screen bg-background relative flex items-center justify-center p-gutter">
+<!-- Decoration Gradients -->
+<div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-tertiary/5 rounded-full blur-[80px] pointer-events-none"></div>
+<div class="w-full max-w-md space-y-xl relative z-10">
+<!-- Header -->
+<div class="space-y-sm text-center md:text-left">
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface md:font-display-lg md:text-display-lg tracking-tight">
+                    Elevate Your Performance
+                </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Access your personalized AI training laboratory.
+                </p>
+</div>
+<!-- Login Controls -->
+<form class="space-y-lg" onsubmit="event.preventDefault();">
+<div class="space-y-md">
+<!-- Email Input -->
+<div class="group">
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-xs ml-md">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">mail</span>
+<input class="w-full h-14 pl-12 pr-md bg-surface-container-lowest glass-stroke rounded-2xl border-none text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary-container/30 transition-all outline-none font-body-md" placeholder="name@luxury-performance.com" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="group">
+<div class="flex justify-between items-center mb-xs px-md">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Password</label>
+<a class="font-label-caps text-label-caps text-primary hover:text-primary-fixed transition-colors" href="#">Forgot?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">lock</span>
+<input class="w-full h-14 pl-12 pr-md bg-surface-container-lowest glass-stroke rounded-2xl border-none text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary-container/30 transition-all outline-none font-body-md" placeholder="••••••••" type="password"/>
+</div>
+</div>
+</div>
+<!-- Sign In Button -->
+<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-full gold-glow hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-sm" type="submit">
+                    Sign In
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+<!-- Divider -->
+<div class="relative py-md">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-white/5"></div>
+</div>
+<div class="relative flex justify-center text-xs uppercase">
+<span class="bg-background px-md font-label-caps text-label-caps text-on-surface-variant/40">Or continue with</span>
+</div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-md">
+<button class="h-14 flex items-center justify-center gap-sm glass-panel glass-stroke rounded-2xl hover:bg-surface-variant/20 transition-all active:scale-95 group">
+<img alt="Google" class="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVF6xWb1mnZIoJxVtMPMOOWcTvi5muGQCdQ3EABwwpxgt60wYAIlYiNk34EMVrUzJGIS_8_uoA_tsTJWwYmv7PlqqAK-BAD89O8uZnPy_-SzF1rEDgqDEtXYyiANN4tfoQJSLZJaz-3l8MgTScAaLAwh1zTYi6S5RzAPSPxgje1jnro95XCDpFih_Z61BpvCGnt_rJNS20nohOJqW6D90NXV3w94drg6Sh_f5YZmlP2BELHgDO1fnUyg"/>
+<span class="font-label-caps text-label-caps text-on-surface">Google</span>
+</button>
+<button class="h-14 flex items-center justify-center gap-sm glass-panel glass-stroke rounded-2xl hover:bg-surface-variant/20 transition-all active:scale-95 group">
+<span class="material-symbols-outlined text-on-surface opacity-80 group-hover:opacity-100 transition-opacity" style="font-variation-settings: 'FILL' 1;">file_download</span>
+<span class="font-label-caps text-label-caps text-on-surface">Apple</span>
+</button>
+</div>
+<!-- Footer Link -->
+<div class="text-center pt-md">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    New to the elite program? 
+                    <a class="text-primary font-bold hover:underline ml-xs" href="#">Create Account</a>
+</p>
+</div>
+</div>
+<!-- System Status Labels (AI Aesthetic Touch) -->
+<div class="absolute bottom-lg right-lg hidden md:flex items-center gap-md">
+<div class="flex items-center gap-xs px-sm py-xs bg-surface-container-low/50 rounded-full border border-white/5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-data-sm text-data-sm text-on-surface-variant/60">SYSTEM ONLINE</span>
+</div>
+<div class="flex items-center gap-xs px-sm py-xs bg-surface-container-low/50 rounded-full border border-white/5">
+<span class="font-data-sm text-data-sm text-on-surface-variant/60">ENC_V4.2</span>
+</div>
+</div>
+</section>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.parentElement.classList.add('scale-[1.02]');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.parentElement.classList.remove('scale-[1.02]');
+            });
+        });
+    </script>
+</body></html>

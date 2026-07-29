@@ -1,33 +1,29 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { RootLayout } from '../layout/RootLayout';
-import { ProtectedRoute } from './ProtectedRoute';
+import { LandingPage } from '../features/01_auth/LandingPage';
+import { LoginPage } from '../features/01_auth/LoginPage';
+import { SignupPage } from '../features/01_auth/SignupPage';
+import { OnboardingOverviewPage } from '../features/03_onboarding/OnboardingOverviewPage';
+import { PersonalDetailsPage } from '../features/03_onboarding/PersonalDetailsPage';
+import { ExperienceLevelPage } from '../features/03_onboarding/ExperienceLevelPage';
+import { HomeDashboardPage } from '../features/09_analytics/HomeDashboardPage';
+import { WorkoutSessionPage } from '../features/04_workout_plan/WorkoutSessionPage';
+import { AiWorkoutCreatorPage } from '../features/07_ai_coach/AiWorkoutCreatorPage';
+import { RecoveryAnalysisPage } from '../features/09_analytics/RecoveryAnalysisPage';
+import { FitnessRecordsPage } from '../features/08_progress_tracking/FitnessRecordsPage';
 
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <RootLayout />,
-    children: [
-      {
-        index: true,
-        element: (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              FitAI X Architecture Ready
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground max-w-xl">
-              Phase 1 Project Initialization & Foundation Complete. Feature implementations will occur in subsequent phases.
-            </p>
-          </div>
-        ),
-      },
-      {
-        element: <ProtectedRoute />,
-        children: [
-          // Protected feature routes will be registered here in future phases
-        ],
-      },
-    ],
-  },
+  { path: '/', element: <LandingPage /> },
+  { path: '/login', element: <LoginPage /> },
+  { path: '/signup', element: <SignupPage /> },
+  { path: '/onboarding', element: <OnboardingOverviewPage /> },
+  { path: '/onboarding/personal-details', element: <PersonalDetailsPage /> },
+  { path: '/onboarding/experience-level', element: <ExperienceLevelPage /> },
+  { path: '/dashboard', element: <HomeDashboardPage /> },
+  { path: '/workout/session', element: <WorkoutSessionPage /> },
+  { path: '/workout/ai-creator', element: <AiWorkoutCreatorPage /> },
+  { path: '/recovery', element: <RecoveryAnalysisPage /> },
+  { path: '/records', element: <FitnessRecordsPage /> },
+  { path: '*', element: <HomeDashboardPage /> },
 ]);
 
 export function AppRouter() {

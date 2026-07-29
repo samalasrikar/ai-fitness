@@ -1,6 +1,6 @@
 // =============================================================================
 // FitAI X – Prisma Database Schema Configuration
-// Database Engine: PostgreSQL
+// Database Engine: SQLite (Local Dev) / PostgreSQL Ready
 // =============================================================================
 
 generator client {
@@ -8,12 +8,125 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Phase 1 Setup Note:
-// Application models (User, WorkoutPlan, Exercise, etc.) will be created in
-// feature-specific implementation phases.
-// ─────────────────────────────────────────────────────────────────────────────
+model User {
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  passwordHash    String
+  avatarUrl       String?
+  gender          String?  @default("Male")
+  age             Int?     @default(28)
+  weight          Float?   @default(185)
+  heightFeet      Int?     @default(6)
+  heightInches    Int?     @default(1)
+  experienceLevel String?  @default("Beginner")
+  fitnessGoal     String?  @default("Hypertrophy")
+  eliteRankScore  Int      @default(750)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  biometrics      UserBiometrics[]
+  workoutSessions WorkoutSession[]
+  fitnessRecords  FitnessRecord[]
+  nutritionLogs   NutritionLog[]
+  aiChats         AiChat[]
+}
+
+model UserBiometrics {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recoveryScore    Int      @default(88)
+  stateStatus      String   @default("Prime State")
+  hrv              Int      @default(62)
+  restingHeartRate Int      @default(62)
+  sleepHours       String   @default("7h 45m")
+  sleepQuality     String   @default("Optimal")
+  sleepChange      String   @default("+12% vs avg")
+  stressLevel      String   @default("Low")
+  stressScore      Int      @default(14)
+  caloriesBurned   Int      @default(1240)
+  stepsCount       String   @default("8.4k")
+  cnsReadiness     String   @default("Peak Readiness")
+  date             DateTime @default(now())
+}
+
+model WorkoutSession {
+  id             String                   @id @default(uuid())
+  userId         String
+  user           User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  durationMinutes Int
+  estCalories    Int
+  status         String                   @default("SUGGESTED") // SUGGESTED, IN_PROGRESS, COMPLETED
+  targetMuscles  String
+  progressPct    Int                      @default(0)
+  completedCount Int                      @default(0)
+  totalCount     Int                      @default(4)
+  exercises      WorkoutSessionExercise[]
+  createdAt      DateTime                 @default(now())
+}
+
+model Exercise {
+  id          String                   @id @default(uuid())
+  title       String
+  category    String
+  setsCount   Int                      @default(3)
+  repsCount   String                   @default("10-12")
+  restSeconds Int                      @default(60)
+  mediaUrl    String
+  isLocked    Boolean                  @default(false)
+  sessions    WorkoutSessionExercise[]
+}
+
+model WorkoutSessionExercise {
+  id               String         @id @default(uuid())
+  workoutSessionId String
+  workoutSession   WorkoutSession @relation(fields: [workoutSessionId], references: [id], onDelete: Cascade)
+  exerciseId       String
+  exercise         Exercise       @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  order            Int
+  isCompleted      Boolean        @default(false)
+}
+
+model FitnessRecord {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  subtitle  String
+  value     String
+  unit      String
+  timeAgo   String
+  category  String   @default("Achievement")
+  createdAt DateTime @default(now())
+}
+
+model NutritionLog {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetCalories   Int      @default(2800)
+  consumedCalories Int      @default(1950)
+  proteinGrams     Int      @default(142)
+  targetProtein    Int      @default(180)
+  carbsGrams       Int      @default(210)
+  targetCarbs      Int      @default(300)
+  fatsGrams        Int      @default(55)
+  targetFats       Int      @default(75)
+  date             DateTime @default(now())
+}
+
+model AiChat {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sender    String   // "FITAI_CORE" or "USER"
+  message   String
+  metrics   String?
+  createdAt DateTime @default(now())
+}

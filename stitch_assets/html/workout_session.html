@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitAI X | Workout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .glass-card {
+            background: rgba(22, 22, 22, 0.6);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .gold-glow {
+            box-shadow: 0 0 20px rgba(245, 196, 0, 0.15);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #353534;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#554600",
+                        "inverse-on-surface": "#313030",
+                        "surface-variant": "#353534",
+                        "on-secondary": "#3b2f00",
+                        "tertiary-fixed-dim": "#ffba38",
+                        "primary-container": "#f5c400",
+                        "on-surface-variant": "#d1c5ab",
+                        "on-secondary-fixed": "#221b00",
+                        "primary-fixed-dim": "#f1c100",
+                        "tertiary": "#ffe2b9",
+                        "secondary-container": "#fad100",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#685200",
+                        "background": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "surface-tint": "#f1c100",
+                        "on-primary-fixed-variant": "#584400",
+                        "on-primary-fixed": "#241a00",
+                        "primary": "#ffe49c",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary": "#fff0c4",
+                        "primary-fixed": "#ffe08b",
+                        "surface-container-highest": "#353534",
+                        "secondary-fixed-dim": "#e9c400",
+                        "outline": "#9a9078",
+                        "surface-bright": "#3a3939",
+                        "tertiary-fixed": "#ffdeac",
+                        "surface-container": "#201f1f",
+                        "on-secondary-container": "#6d5a00",
+                        "secondary-fixed": "#ffe171",
+                        "outline-variant": "#4e4632",
+                        "on-background": "#e5e2e1",
+                        "inverse-primary": "#745b00",
+                        "inverse-surface": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#724e00",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-low": "#1c1b1b",
+                        "surface": "#131313",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-container": "#ffbf4d",
+                        "on-primary": "#3d2f00",
+                        "surface-dim": "#131313",
+                        "on-tertiary-fixed-variant": "#604100",
+                        "on-tertiary-fixed": "#281900",
+                        "on-tertiary": "#432c00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "xxl": "48px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "container-margin": "24px",
+                        "xxxl": "64px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Manrope"],
+                        "label-caps": ["Manrope"],
+                        "data-lg": ["JetBrains Mono"],
+                        "headline-md": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "data-sm": ["JetBrains Mono"],
+                        "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "data-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "data-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 shadow-2xl flex justify-between items-center px-container-margin py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A professional high-fidelity close-up portrait of a fitness user's profile photo. The lighting is dramatic and moody with golden rim light, emphasizing a high-performance athletic aesthetic. The background is a dark, minimalist gym environment with soft bokeh. Elite and premium quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEtMjbq8CY1q3jEE7CeGQZFDM2CVgvUyUpy5MH9LHhyDo2sDomDCxVZkP9hT6d3ef5hCLvQ1rbdLvBnpAjkhiR9J69p-Z1-7DN-LeAk-mf5YMkW1_8GXqLgV6rhp4YSoTv66J5AhUO9zYO2zy-vJMBlcVVHWjy1cJaS79VWPvJfYMYICuY5hMuK95EEeF85QNcMB1ZQKXQR2OvSOzz_km7DTKQyvQPUInCNU2ycy2cV3UHQHgsN54ybg"/>
+</div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tighter">FitAI X</h1>
+</div>
+<div class="active:scale-95 transition-transform hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary text-2xl">notifications</span>
+</div>
+</header>
+<main class="pt-[72px] pb-32">
+<!-- Hero Section -->
+<section class="relative w-full h-[442px] flex items-end">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="A highly detailed 3D AI fitness assistant with a sleek, translucent glass-like skin and golden internal circuitry glowing softly. The character is in a dynamic, powerful stance within a futuristic, dark fitness lab. The background is pure black with subtle golden atmospheric particles. Cinematic lighting, hyper-realistic textures, and 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdMsEw0Fr1eVT23ryVN_FybG09m_6yVdiP9uMieKyX_-paqwynrGSPg9o0oDHVp-hyG7LjmLul6uH4TrTMI0GE1fsY8TqJkfhX-8ypejRnB16mxyfDtc4KzMQkrhNXifOGz5T0AK6iM1NoxutRLejZ8Bo23ZY-GDBohPHXbf_StW-aXydPlQKnp9_LnRDwwDK_X_4w773AFjh_aBeQ23O_zt7cQSe2Uk6S6u1IenF1xaYkKQdPNEGjFg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+</div>
+<div class="relative z-10 px-container-margin pb-lg w-full">
+<div class="flex flex-col gap-xs mb-sm">
+<span class="font-label-caps text-label-caps text-primary tracking-widest">CURRENT SESSION</span>
+<h2 class="font-display-lg text-display-lg text-on-surface leading-none">Hypertrophy: Pull A</h2>
+</div>
+<div class="flex gap-lg">
+<div class="flex flex-col">
+<span class="font-data-lg text-data-lg text-primary">65 MIN</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant/60 uppercase">Duration</span>
+</div>
+<div class="flex flex-col">
+<span class="font-data-lg text-data-lg text-primary">420 KCAL</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant/60 uppercase">Est. Burn</span>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Start Button -->
+<div class="px-container-margin -mt-8 relative z-20">
+<button class="w-full py-lg bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-full gold-glow active:scale-95 transition-all flex justify-center items-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                Start Workout
+            </button>
+</div>
+<!-- Progress Overview -->
+<section class="px-container-margin mt-xl">
+<div class="glass-card rounded-xl p-lg flex items-center justify-between">
+<div class="flex flex-col">
+<h3 class="font-body-lg text-body-lg text-on-surface font-bold">Session Progress</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">2 of 6 exercises completed</p>
+</div>
+<div class="relative w-16 h-16">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-white/5" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-primary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="175.9" stroke-dashoffset="117.2" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="font-data-sm text-data-sm text-primary">33%</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Exercise List -->
+<section class="px-container-margin mt-xl flex flex-col gap-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Exercise Queue</h3>
+<span class="font-label-caps text-label-caps text-primary">VIEW ALL</span>
+</div>
+<!-- Card 1 -->
+<div class="glass-card rounded-xl p-md flex gap-md group hover:bg-white/5 transition-colors cursor-pointer">
+<div class="w-24 h-24 rounded-lg bg-surface-container overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover" data-alt="Close-up of a high-end chrome pull-up bar being gripped by professional hands, dramatic lighting, golden accents, minimalist dark background, high resolution photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_tvbaoZN5781tm0hNpTNSv5guxg8NuZDAA0721bHwF0a_vSffGfkjPUuxTSB0JVPID7kS61uY7-6DLFeGXQ-vAvGPIO31blATMeu9YNg2tf-o55dRy9GT-xCUXX7C5HmLkoRZXtwnfodfEN2MbJD53Xc-HWl_NafY5rLrfDil66qOlaxgEqg6hLyHdpP8M0f0V1Qny741yokFF-bdqnabwaU_cmw47B31MWHdorQqmgNHdwqWXSqAqw"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start">
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface">Weighted Pull-ups</h4>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex gap-md mt-sm">
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-on-surface-variant">4 SETS</span>
+</div>
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-on-surface-variant">8-10 REPS</span>
+</div>
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-primary">90s REST</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="glass-card rounded-xl p-md flex gap-md group hover:bg-white/5 transition-colors cursor-pointer">
+<div class="w-24 h-24 rounded-lg bg-surface-container overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover" data-alt="High-fidelity 3D render of a luxury black marble dumbbell sitting on a glass floor, glowing golden reflections, futuristic gym setting, sharp focus, professional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCAiY2r7HvGPszgVpF5c490qR9s_kUFrtqRXZhPbWRnKmHebggbg2ai4KofX86-FObtSD3ozOJq1n8yuH9AH6PiNBVXTDvLAtmgCkPNzqj0Vd92qnBrogEz_KUboZbBzvjDV8-6k9VJxDfD7MhH5tqmzGvjtIiP6oToldwpx1LgL_RD5tVkGINj34X8P4JIS_gl_d2Zvl8XqRi5PwuCkMEExNESxM3jeMxBuKoOltUBRNkeWT5F49MRA"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start">
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface">Bent Over Rows</h4>
+<span class="material-symbols-outlined text-white/10">circle</span>
+</div>
+<div class="flex gap-md mt-sm">
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-on-surface-variant">3 SETS</span>
+</div>
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-on-surface-variant">12 REPS</span>
+</div>
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-primary">60s REST</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="glass-card rounded-xl p-md flex gap-md group hover:bg-white/5 transition-colors cursor-pointer">
+<div class="w-24 h-24 rounded-lg bg-surface-container overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover" data-alt="Abstract macro shot of high-quality gym equipment cables and pulleys, metallic textures, golden light streaks, dark luxury atmosphere, cinematic depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMzP07Nj6lF6nd-jDewdfIm7tZFt7aPgcwxYPO85JzexIJxjNvEDYufm6eKlBmDjdaxLOP7_U1rP-CvXpA6NYa1MpidZCMlI81uiGVrf26IpVS3X6RZs4k1ZmII1I84RqFPtw6WBVNC37Op74XtxKZtM41LgUASDrYulO6G1AZBgs39gLjQrT0RfDQuu6XmWSZWvtUWIrR89ynLUkLUVrDJ5vsGu_rdXXO9hx7f8AnUVzv4mqVIWhBKQ"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start">
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface">Face Pulls</h4>
+<span class="material-symbols-outlined text-white/10">circle</span>
+</div>
+<div class="flex gap-md mt-sm">
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-on-surface-variant">3 SETS</span>
+</div>
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-on-surface-variant">15 REPS</span>
+</div>
+<div class="bg-surface-container-lowest px-sm py-xs rounded border border-white/5">
+<span class="font-data-sm text-data-sm text-primary">45s REST</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 (Locked/Upcoming) -->
+<div class="glass-card opacity-50 rounded-xl p-md flex gap-md">
+<div class="w-24 h-24 rounded-lg bg-surface-container-lowest flex items-center justify-center border border-white/5">
+<span class="material-symbols-outlined text-white/20 text-3xl">lock</span>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface/40">Incline Curls</h4>
+<p class="font-data-sm text-data-sm text-on-surface-variant/40">Up Next</p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container/40 backdrop-blur-2xl border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex justify-around items-center h-20 px-sm pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold scale-110 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+<span class="font-label-caps text-label-caps">Workout</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">local_fire_department</span>
+<span class="font-label-caps text-label-caps">Calories</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Records</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for the start button
+        const startBtn = document.querySelector('button');
+        startBtn.addEventListener('mousedown', () => {
+            startBtn.classList.add('shadow-inner');
+        });
+        startBtn.addEventListener('mouseup', () => {
+            startBtn.classList.remove('shadow-inner');
+        });
+
+        // Add subtle parallax effect on scroll for hero
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroImg = document.querySelector('section img');
+            if (heroImg) {
+                heroImg.style.transform = `translateY(${scrolled * 0.4}px)`;
+            }
+        });
+    </script>
+</body></html>

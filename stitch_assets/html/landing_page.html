@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitAI X | Elevate Your Human Potential</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffdeac",
+                    "surface-variant": "#353534",
+                    "error": "#ffb4ab",
+                    "on-primary-fixed": "#241a00",
+                    "error-container": "#93000a",
+                    "surface": "#131313",
+                    "on-secondary-fixed": "#221b00",
+                    "tertiary-container": "#ffbf4d",
+                    "surface-container": "#201f1f",
+                    "outline-variant": "#4e4632",
+                    "surface-container-high": "#2a2a2a",
+                    "secondary-container": "#fad100",
+                    "on-tertiary-fixed": "#281900",
+                    "outline": "#9a9078",
+                    "on-tertiary": "#432c00",
+                    "tertiary": "#ffe2b9",
+                    "inverse-surface": "#e5e2e1",
+                    "surface-container-lowest": "#0e0e0e",
+                    "primary-fixed": "#ffe08b",
+                    "primary": "#ffe49c",
+                    "on-primary-fixed-variant": "#584400",
+                    "on-background": "#e5e2e1",
+                    "surface-container-highest": "#353534",
+                    "on-tertiary-fixed-variant": "#604100",
+                    "on-secondary-container": "#6d5a00",
+                    "secondary": "#fff0c4",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#f1c100",
+                    "on-secondary-fixed-variant": "#554600",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary-container": "#724e00",
+                    "on-primary": "#3d2f00",
+                    "on-secondary": "#3b2f00",
+                    "secondary-fixed-dim": "#e9c400",
+                    "primary-container": "#f5c400",
+                    "on-surface-variant": "#d1c5ab",
+                    "secondary-fixed": "#ffe171",
+                    "inverse-primary": "#745b00",
+                    "surface-tint": "#f1c100",
+                    "surface-bright": "#3a3939",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-low": "#1c1b1b",
+                    "inverse-on-surface": "#313030",
+                    "background": "#131313",
+                    "surface-dim": "#131313",
+                    "tertiary-fixed-dim": "#ffba38",
+                    "on-primary-container": "#685200"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xxl": "48px",
+                    "lg": "24px",
+                    "xxxl": "64px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "md": "16px",
+                    "gutter": "16px",
+                    "xl": "32px",
+                    "container-margin": "24px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Manrope"],
+                    "data-lg": ["JetBrains Mono"],
+                    "body-lg": ["Manrope"],
+                    "display-lg": ["Manrope"],
+                    "data-sm": ["JetBrains Mono"],
+                    "label-caps": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "display-lg-mobile": ["Manrope"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "data-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "data-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #E5E2E1;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(22, 22, 22, 0.7);
+            backdrop-filter: blur(30px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .gold-glow {
+            box-shadow: 0 0 40px rgba(245, 196, 0, 0.15);
+        }
+        .mesh-bg {
+            background: radial-gradient(circle at 50% 50%, rgba(245, 196, 0, 0.05) 0%, transparent 70%);
+        }
+        .nav-active-indicator {
+            position: absolute;
+            bottom: -8px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: #ffe49c;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-container-margin py-md shadow-2xl">
+<div class="flex items-center gap-sm">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tighter">FitAI X</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="active:scale-95 transition-transform text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[28px]" data-icon="notifications">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full border border-primary/20 p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="A professional studio portrait of a fit individual with high-end lighting, representing a premium user profile. The aesthetic is dark and minimalist with subtle golden rim lighting to match the FitAI X brand colors. The person has a focused, determined expression against a deep charcoal background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKWOr9Ob6p48gO7Ap8ipBBhjvZx_Yu2SECOX8ZG_JOewzpBCW4CA6lLOGeiT7buA8RmIeuqdvjHZ_vSp0G_r4kNCTa2umLLTtSL9EYuaKF8MgKIPXQRMvJ5ujq8g6PZSlzW0Z8jAj7h8pgwHq861nEN9Cfx52PBOtUxldI5rsJRVwtQjIAhOKkDQgc6qII0C7jZoS6lhEGCyUma_2lKlPuU8i9ZRQ_UUQ310iQD1M0uyPsS6A1ScG5qg"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32">
+<!-- Hero Section -->
+<section class="px-container-margin mb-xxl relative overflow-hidden">
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 blur-[100px] rounded-full"></div>
+<div class="relative z-10 space-y-md mb-xl">
+<span class="font-label-caps text-label-caps text-primary tracking-[0.2em] uppercase">The Future of Human Performance</span>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface leading-tight">Elevate Your <br/><span class="text-primary italic">Human Potential.</span></h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xs">AI-powered adaptive fitness intelligence that learns from your body in real-time.</p>
+<div class="flex flex-col gap-md pt-md">
+<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-full gold-glow active:scale-95 transition-all flex items-center justify-center gap-sm">
+                        Get Started
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full h-14 glass-card border border-white/10 text-on-surface font-headline-md text-headline-md rounded-full active:scale-95 transition-all">
+                        Explore Features
+                    </button>
+</div>
+</div>
+<!-- Hero Visual -->
+<div class="relative w-full aspect-[4/3] rounded-xxl overflow-hidden glass-card mt-xl border border-white/5">
+<img class="w-full h-full object-cover opacity-80" data-alt="A futuristic 3D visualization of a human muscular system glowing with golden neural pathways. The aesthetic is high-end, cinematic, and technical, set against a deep black background. Soft volumetric lighting highlights the anatomical precision, while floating data points and golden light trails suggest artificial intelligence processing athletic performance data." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKox70xDOraGef3lmwi7NOrMBUFEO2SsFc99F6IyBk1pBywi_RHAIR0dUddud7kjFo_DepU0noP7BJPZSxOnmyZe2NW9rNqLLEy1l9JwWhvTb1N8_9XmLbLCxeVq_VvdtCUv4VnTyRgeV9o_bauPp8A3ZHM5rYvR2p8LGIpkwqMIKkHPid1KLKwFYP5lIDK3vC14ItDK_ZzDnr-R_bPFQkx_dcAWCPQe_iVAnV7Xftzp20PSwxvw-nIw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute bottom-md left-md right-md flex justify-between items-end">
+<div class="glass-card px-md py-sm rounded-xl border border-white/10">
+<span class="font-data-sm text-data-sm text-primary block">BIOMETRIC SYNC</span>
+<span class="font-headline-md text-headline-md text-on-surface">Active</span>
+</div>
+<div class="flex flex-col items-end gap-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ENGINE STATUS</span>
+<div class="flex gap-1">
+<div class="w-1 h-3 bg-primary rounded-full"></div>
+<div class="w-1 h-5 bg-primary rounded-full"></div>
+<div class="w-1 h-2 bg-primary rounded-full"></div>
+<div class="w-1 h-4 bg-primary rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Neural Engine Section -->
+<section class="px-container-margin mb-xxl">
+<div class="flex items-center justify-between mb-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface">Neural Engine</h2>
+<span class="material-symbols-outlined text-primary" data-icon="neurology">neurology</span>
+</div>
+<div class="glass-card p-xl rounded-xxl mesh-bg relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-20">
+<span class="material-symbols-outlined text-6xl text-primary" data-icon="memory">memory</span>
+</div>
+<div class="space-y-md relative z-10">
+<div class="inline-flex items-center px-sm py-xs bg-primary/10 rounded-full border border-primary/20">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse mr-2"></span>
+<span class="font-label-caps text-label-caps text-primary">REAL-TIME ADAPTATION</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Our core engine processes 4,000+ data points per second, adjusting your workout intensity the moment your form or heart rate deviates from your peak performance zone.</p>
+<div class="flex gap-md pt-sm">
+<div class="flex flex-col">
+<span class="font-data-lg text-data-lg text-primary">98.4%</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">ACCURACY</span>
+</div>
+<div class="w-[1px] h-10 bg-white/10"></div>
+<div class="flex flex-col">
+<span class="font-data-lg text-data-lg text-primary">&lt;10ms</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">LATENCY</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Data-Driven Recovery Bento -->
+<section class="px-container-margin mb-xxl">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Data-Driven Recovery</h2>
+<div class="grid grid-cols-2 gap-md">
+<!-- Recovery Card 1: Sleep -->
+<div class="col-span-2 glass-card p-lg rounded-xxl flex flex-col justify-between min-h-[180px]">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center border border-white/5">
+<span class="material-symbols-outlined text-primary" data-icon="bedtime">bedtime</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">SLEEP HYGIENE</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Neural Rest</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Deep integration with your circadian rhythm and REM cycles.</p>
+</div>
+</div>
+<!-- Recovery Card 2: HRV -->
+<div class="glass-card p-lg rounded-xxl aspect-square flex flex-col justify-between">
+<div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="monitor_heart">monitor_heart</span>
+</div>
+<div>
+<span class="font-data-lg text-data-lg text-on-surface">HRV</span>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Strain Index</p>
+</div>
+</div>
+<!-- Recovery Card 3: Coaching -->
+<div class="glass-card p-lg rounded-xxl aspect-square flex flex-col justify-between">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="psychology">psychology</span>
+</div>
+<div>
+<span class="font-data-lg text-data-lg text-on-surface">Insight</span>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Daily Score</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Elite Performance Section -->
+<section class="px-container-margin mb-xxl">
+<div class="flex items-center gap-sm mb-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface">Elite Performance</h2>
+</div>
+<div class="relative rounded-xxl overflow-hidden h-[400px]">
+<img class="w-full h-full object-cover" data-alt="A high-end, dramatic photography of a professional athlete training in a dark, atmospheric gym. The lighting is focused, highlighting the sweat and muscle definition with golden accents. There are subtle digital UI overlays floating near the athlete, showing performance metrics in a sleek, semi-transparent font. The overall mood is intense, luxurious, and technologically advanced." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7AZ3TaUgQsKqAyzwyifZmxnYP0OEWPsT7oH22ub6fF462ZpFbgQiqbsexq4JLDunWAbPmeL8vJguKLUWQ6ckMKXnqtDj3DFLCOOPUYPsnuc_CpctVaeb7XRZT1xbTyvWUpp7eSBO3x9BiTOAttqzrAJZLczcJM-EkZdfeQMIzIyni0FuvTPvM3MKHuoBB88mYzDgn9LcLnizu7FCaKZWGc2-5mZONOHl0PI804sbVkmkIBOltfUTFAA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-xl space-y-md">
+<h3 class="font-display-lg-mobile text-display-lg-mobile text-on-surface">Personalized Coaching</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Join an exclusive ecosystem designed for those who demand absolute precision in their pursuit of mastery.</p>
+<button class="bg-white/10 backdrop-blur-md border border-white/20 text-white font-headline-md text-headline-md px-xl py-md rounded-full hover:bg-white/20 transition-all flex items-center gap-sm w-fit">
+                        Join the Elite
+                        <span class="material-symbols-outlined" data-icon="grade">grade</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Final CTA Section -->
+<section class="px-container-margin py-xxl mb-xl text-center">
+<div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-xl border border-primary/20">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="bolt">bolt</span>
+</div>
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-on-surface mb-md">Ready to Transcend?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl max-w-xs mx-auto">Limited memberships available for the beta performance cohort.</p>
+<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-full gold-glow active:scale-95 transition-all">
+                Claim My Invite
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container/40 backdrop-blur-2xl border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex justify-around items-center h-20 px-sm pb-safe">
+<button class="flex flex-col items-center justify-center text-primary font-bold scale-110 active:scale-90 transition-all duration-300 relative">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-label-caps mt-1">Home</span>
+<div class="nav-active-indicator"></div>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+<span class="font-label-caps text-label-caps mt-1">Workout</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="local_fire_department">local_fire_department</span>
+<span class="font-label-caps text-label-caps mt-1">Calories</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-caps text-label-caps mt-1">Records</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-caps text-label-caps mt-1">Profile</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for button hover effects
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', () => {
+                button.classList.add('opacity-80');
+            });
+            button.addEventListener('touchend', () => {
+                button.classList.remove('opacity-80');
+            });
+        });
+
+        // Simple scroll reveal observer
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-8');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-700', 'ease-out', 'opacity-0', 'translate-y-8');
+            observer.observe(section);
+        });
+    </script>
+</body></html>

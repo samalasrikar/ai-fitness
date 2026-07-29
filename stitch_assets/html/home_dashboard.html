@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitAI X | Elite Performance Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#554600",
+                    "inverse-on-surface": "#313030",
+                    "surface-variant": "#353534",
+                    "on-secondary": "#3b2f00",
+                    "tertiary-fixed-dim": "#ffba38",
+                    "primary-container": "#f5c400",
+                    "on-surface-variant": "#d1c5ab",
+                    "on-secondary-fixed": "#221b00",
+                    "primary-fixed-dim": "#f1c100",
+                    "tertiary": "#ffe2b9",
+                    "secondary-container": "#fad100",
+                    "on-error": "#690005",
+                    "error-container": "#93000a",
+                    "on-primary-container": "#685200",
+                    "background": "#131313",
+                    "on-surface": "#e5e2e1",
+                    "surface-tint": "#f1c100",
+                    "on-primary-fixed-variant": "#584400",
+                    "on-primary-fixed": "#241a00",
+                    "primary": "#ffe49c",
+                    "surface-container-high": "#2a2a2a",
+                    "secondary": "#fff0c4",
+                    "primary-fixed": "#ffe08b",
+                    "surface-container-highest": "#353534",
+                    "secondary-fixed-dim": "#e9c400",
+                    "outline": "#9a9078",
+                    "surface-bright": "#3a3939",
+                    "tertiary-fixed": "#ffdeac",
+                    "surface-container": "#201f1f",
+                    "on-secondary-container": "#6d5a00",
+                    "secondary-fixed": "#ffe171",
+                    "outline-variant": "#4e4632",
+                    "on-background": "#e5e2e1",
+                    "inverse-primary": "#745b00",
+                    "inverse-surface": "#e5e2e1",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#724e00",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-low": "#1c1b1b",
+                    "surface": "#131313",
+                    "surface-container-lowest": "#0e0e0e",
+                    "tertiary-container": "#ffbf4d",
+                    "on-primary": "#3d2f00",
+                    "surface-dim": "#131313",
+                    "on-tertiary-fixed-variant": "#604100",
+                    "on-tertiary-fixed": "#281900",
+                    "on-tertiary": "#432c00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "xxl": "48px",
+                    "gutter": "16px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "container-margin": "24px",
+                    "xxxl": "64px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": ["Manrope"],
+                    "label-caps": ["Manrope"],
+                    "data-lg": ["JetBrains Mono"],
+                    "headline-md": ["Manrope"],
+                    "display-lg": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "data-sm": ["JetBrains Mono"],
+                    "body-lg": ["Manrope"]
+            },
+            "fontSize": {
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "data-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "data-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(22, 22, 22, 0.6);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
+        .gold-glow {
+            box-shadow: 0 0 25px rgba(245, 196, 0, 0.15);
+        }
+        .gold-stroke {
+            border: 1px solid rgba(245, 196, 0, 0.3);
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.8s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-container-margin py-md shadow-2xl">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A professional, high-end profile portrait of a modern fitness enthusiast in a high-tech athletic environment. Soft cinematic lighting with deep shadows, emphasizing a luxurious and focused aesthetic. The background is a blurred, futuristic training facility with golden and charcoal accents, matching a premium dark-mode UI design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcWCrvxj8y26vV4zRfK7od5AubLI5bv1wiI3H45v45RFfaogSPBH9KiFU04RFRugt1dlPgZG3JATPiwvX4hU2LwTk8dZVYvBEbAOoDo3wg3a5IaNbOaL4Z5AjL63a-BoUB5Stw-tppOGsgAhlyVALtAQC1K40lgFIvn-Y_mD0EjSzWwKCYI2JIs6SQU6NdZB7s1FmQhSrqeEpWpRRxUP3qZViG_QnQyLOUPN-jULY2puy7R74NWYkNJg"/>
+</div>
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tighter">FitAI X</span>
+</div>
+<button class="material-symbols-outlined text-primary text-2xl active:scale-95 transition-transform">
+            notifications
+        </button>
+</header>
+<main class="pt-xxxl px-container-margin space-y-xl">
+<!-- Recovery Score: Large Glassmorphic Ring -->
+<section class="glass-card rounded-[24px] p-lg mt-md flex flex-col items-center relative overflow-hidden">
+<!-- Animated Background Mesh Hint -->
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,_rgba(245,196,0,0.2),transparent_70%)]"></div>
+<div class="relative w-48 h-48">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle class="text-white/5" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary progress-ring-circle" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="30.14" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-data-lg text-[48px] text-primary">88</span>
+<span class="font-label-caps text-on-surface-variant/70">RECOVERY</span>
+</div>
+</div>
+<div class="mt-lg text-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Prime State</h3>
+<p class="font-body-md text-on-surface-variant/80 mt-xs">Your CNS is fully recharged. High intensity recommended.</p>
+</div>
+</section>
+<!-- Horizontal Stats Scroll -->
+<section class="flex gap-md overflow-x-auto pb-sm -mx-container-margin px-container-margin">
+<div class="glass-card min-w-[140px] p-md rounded-xl space-y-sm">
+<div class="flex items-center gap-xs text-primary/70">
+<span class="material-symbols-outlined text-sm">favorite</span>
+<span class="font-label-caps">HEART RATE</span>
+</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-data-lg text-data-lg text-on-surface">62</span>
+<span class="font-data-sm text-data-sm text-on-surface-variant">BPM</span>
+</div>
+</div>
+<div class="glass-card min-w-[140px] p-md rounded-xl space-y-sm">
+<div class="flex items-center gap-xs text-primary/70">
+<span class="material-symbols-outlined text-sm">local_fire_department</span>
+<span class="font-label-caps">CALORIES</span>
+</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-data-lg text-data-lg text-on-surface">1,240</span>
+<span class="font-data-sm text-data-sm text-on-surface-variant">KCAL</span>
+</div>
+</div>
+<div class="glass-card min-w-[140px] p-md rounded-xl space-y-sm">
+<div class="flex items-center gap-xs text-primary/70">
+<span class="material-symbols-outlined text-sm">footprint</span>
+<span class="font-label-caps">STEPS</span>
+</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-data-lg text-data-lg text-on-surface">8.4k</span>
+<span class="font-data-sm text-data-sm text-on-surface-variant">STEPS</span>
+</div>
+</div>
+</section>
+<!-- Today's AI Workout Card -->
+<section class="relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent rounded-[24px] blur-xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+<div class="glass-card rounded-[24px] p-lg relative border-primary/20">
+<div class="flex justify-between items-start mb-lg">
+<div>
+<span class="font-label-caps text-primary mb-xs block">SUGGESTED SESSION</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Hypertrophy: Pull A</h2>
+</div>
+<div class="bg-primary/10 px-sm py-xs rounded-lg border border-primary/20">
+<span class="font-data-sm text-primary">65 MIN</span>
+</div>
+</div>
+<div class="flex items-center gap-lg mb-xl">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full glass-card border border-white/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A close-up of a high-tech gym dumbbell with a sleek matte finish and golden accents. The lighting is dramatic and low-key, highlighting the premium texture and the luxury athletic environment. The shot is part of a series for an elite AI fitness application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJLwGMZwAhR04EiGZauF6Zfk7XDHw4T4FAaJ9qkvFYyubqWoTUuygrLRf0Re2schc3qjGtt6qtbqPyiTLQbft5b4idMmpq8GewVT1_ZyYoyPgTB9WvVDzOOjos4WTvMU_URlOdMPniANQde0sinhKJF7hL39YuXCiEbFvzqi0Qbgvz1FAKXCgCInxtcA57Pydl4OgGPMZtENiv2PHKEymiPj0ip6_JW8DvzCJqKL3g3TYQZLJFREiHvQ"/>
+</div>
+<div class="w-10 h-10 rounded-full glass-card border border-white/20 flex items-center justify-center bg-surface-container">
+<span class="material-symbols-outlined text-primary text-sm">fitness_center</span>
+</div>
+</div>
+<div class="text-on-surface-variant/70 font-body-md">
+                        Targets: Lats, Biceps, Rear Delts
+                    </div>
+</div>
+<button class="w-full bg-primary py-md rounded-full text-on-primary font-bold gold-glow flex items-center justify-center gap-sm active:scale-95 transition-all">
+<span class="material-symbols-outlined">play_arrow</span>
+                    Start Workout
+                </button>
+</div>
+</section>
+<!-- Nutrition Summary -->
+<section class="glass-card rounded-[24px] p-lg space-y-lg">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Nutrition</h3>
+<span class="font-data-sm text-primary">Target: 2,800 kcal</span>
+</div>
+<div class="space-y-md">
+<div class="space-y-xs">
+<div class="flex justify-between font-label-caps text-[10px] text-on-surface-variant">
+<span>PROTEIN</span>
+<span>142g / 180g</span>
+</div>
+<div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between font-label-caps text-[10px] text-on-surface-variant">
+<span>CARBS</span>
+<span>210g / 300g</span>
+</div>
+<div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim rounded-full" style="width: 70%"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between font-label-caps text-[10px] text-on-surface-variant">
+<span>FATS</span>
+<span>55g / 75g</span>
+</div>
+<div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-fixed-dim rounded-full" style="width: 73%"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container/40 backdrop-blur-2xl border-t border-white/10 flex justify-around items-center h-20 px-sm pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center justify-center text-primary font-bold scale-110 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">Workout</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">local_fire_department</span>
+<span class="font-label-caps text-label-caps">Calories</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Records</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple scroll reveal interaction
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-4');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-4');
+            observer.observe(section);
+        });
+    </script>
+</body></html>
