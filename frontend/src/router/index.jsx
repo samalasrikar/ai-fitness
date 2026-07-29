@@ -1,30 +1,34 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { RootLayout } from '../layout/RootLayout';
 import { ProtectedRoute } from './ProtectedRoute';
+import LandingOrDashboard from '../components/LandingOrDashboard';
+import FitXAIDashboard from '../components/FitXAIDashboard';
+import OnboardingWizard from '../components/OnboardingWizard';
+import Login from '../components/Login';
+import Signup from '../components/Signup';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <RootLayout />,
+    element: <LandingOrDashboard />,
+  },
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/signup',
+    element: <Signup />,
+  },
+  {
+    element: <ProtectedRoute />,
     children: [
       {
-        index: true,
-        element: (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              FitAI X Architecture Ready
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground max-w-xl">
-              Phase 1 Project Initialization & Foundation Complete. Feature implementations will occur in subsequent phases.
-            </p>
-          </div>
-        ),
+        path: '/dashboard',
+        element: <FitXAIDashboard />,
       },
       {
-        element: <ProtectedRoute />,
-        children: [
-          // Protected feature routes will be registered here in future phases
-        ],
+        path: '/setup',
+        element: <OnboardingWizard />,
       },
     ],
   },
