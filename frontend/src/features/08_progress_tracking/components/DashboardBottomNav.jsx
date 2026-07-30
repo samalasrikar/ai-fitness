@@ -8,7 +8,7 @@ export default function DashboardBottomNav({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5 px-4 h-16 flex items-center justify-around">
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[1000] bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5 px-4 h-16 flex items-center justify-around">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (

@@ -1,6 +1,6 @@
 export default function DashboardHeader({ activeTab, nutritionSubView }) {
   return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5 shadow-lg">
+    <header className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[1000] bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5 shadow-lg">
       <div className="h-14 px-6 flex items-center justify-between">
         {activeTab === 'home' ? (
           <div className="flex items-center gap-2">

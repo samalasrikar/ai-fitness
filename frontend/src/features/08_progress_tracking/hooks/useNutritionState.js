@@ -1,40 +1,57 @@
 import { useState, useEffect } from 'react';
-import { DEFAULT_MEAL_IMAGE, INITIAL_MEALS } from '../constants/dashboardConstants';
+import { DEFAULT_MEAL_IMAGE } from '../constants/dashboardConstants';
 import { nutritionApi } from '../../shared/services/nutrition.api';
 
-export function useNutritionState(addTimer) {
+export function useNutritionState() {
   const [nutritionSubView, setNutritionSubView] = useState('dashboard');
-  const [currentCalories, setCurrentCalories] = useState(2450);
-  const [currentProtein, setCurrentProtein] = useState(165);
-  const [currentCarbs, setCurrentCarbs] = useState(210);
-  const [currentFat, setCurrentFat] = useState(65);
+  const [currentCalories, setCurrentCalories] = useState(0);
+  const [currentProtein, setCurrentProtein] = useState(0);
+  const [currentCarbs, setCurrentCarbs] = useState(0);
+  const [currentFat, setCurrentFat] = useState(0);
 
   const [mealInput, setMealInput] = useState('');
   const [mealType, setMealType] = useState('Lunch');
   const [isAnalyzingMeal, setIsAnalyzingMeal] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [loggedMeals, setLoggedMeals] = useState(INITIAL_MEALS);
+  const [loggedMeals, setLoggedMeals] = useState([]);
+  const [isMealsLoading, setIsMealsLoading] = useState(true);
+  const [mealsError, setMealsError] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
+    setIsMealsLoading(true);
     nutritionApi.getLoggedMeals()
       .then((res) => {
-        if (isMounted && res.data && res.data.length > 0) {
-          const apiMeals = res.data.map(m => ({
-            id: m.id,
-            title: m.title,
-            time: m.timeLabel || '12:30 PM',
-            calories: m.calories,
-            protein: m.protein,
-            carbs: m.carbs,
-            fat: m.fat,
-            img: m.imgUrl || DEFAULT_MEAL_IMAGE
-          }));
-          setLoggedMeals(apiMeals);
-        }
+        if (!isMounted) return;
+        const meals = (res.data || []).map(m => ({
+          id: m.id,
+          title: m.title,
+          time: m.timeLabel || '12:00 PM',
+          calories: m.calories || 0,
+          protein: m.protein || 0,
+          carbs: m.carbs || 0,
+          fat: m.fat || 0,
+          img: m.imgUrl || DEFAULT_MEAL_IMAGE
+        }));
+        setLoggedMeals(meals);
+        // Aggregate today's totals from API data
+        const totals = meals.reduce((acc, m) => ({
+          cal: acc.cal + (m.calories || 0),
+          pro: acc.pro + (m.protein || 0),
+          carb: acc.carb + (m.carbs || 0),
+          fat: acc.fat + (m.fat || 0)
+        }), { cal: 0, pro: 0, carb: 0, fat: 0 });
+        setCurrentCalories(totals.cal);
+        setCurrentProtein(totals.pro);
+        setCurrentCarbs(totals.carb);
+        setCurrentFat(totals.fat);
       })
-      .catch(() => {});
-
+      .catch((e) => {
+        if (isMounted) setMealsError('Failed to load meals. Pull to refresh.');
+      })
+      .finally(() => {
+        if (isMounted) setIsMealsLoading(false);
+      });
     return () => { isMounted = false; };
   }, []);
 
@@ -42,24 +59,13 @@ export function useNutritionState(addTimer) {
     if (!mealInput.trim()) return;
     setIsAnalyzingMeal(true);
     setAnalysisResult(null);
-
     try {
       const res = await nutritionApi.analyzeMeal(mealInput);
-      if (res.data) {
-        setAnalysisResult(res.data);
-      }
+      if (res.data) setAnalysisResult(res.data);
     } catch (e) {
-      let cals = 350;
-      let p = 12;
-      let c = 40;
-      let f = 8;
-      let fib = 2;
+      // Graceful fallback estimation
       setAnalysisResult({
-        calories: cals,
-        protein: p,
-        carbs: c,
-        fat: f,
-        fiber: fib,
+        calories: 350, protein: 12, carbs: 40, fat: 8, fiber: 2,
         description: mealInput
       });
     } finally {
@@ -69,9 +75,8 @@ export function useNutritionState(addTimer) {
 
   const handleAddMealToLog = async () => {
     if (!analysisResult) return;
-
     const mealData = {
-      title: `Logged ${mealType}`,
+      title: `${mealType}`,
       mealType,
       timeLabel: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       calories: analysisResult.calories,
@@ -80,7 +85,6 @@ export function useNutritionState(addTimer) {
       fat: analysisResult.fat,
       imgUrl: DEFAULT_MEAL_IMAGE
     };
-
     try {
       const res = await nutritionApi.logMeal(mealData);
       const saved = res.data;
@@ -88,28 +92,34 @@ export function useNutritionState(addTimer) {
         id: saved?.id || `meal-${Date.now()}`,
         title: saved?.title || mealData.title,
         time: saved?.timeLabel || mealData.timeLabel,
-        calories: saved?.calories || mealData.calories,
-        protein: saved?.protein || mealData.protein,
-        carbs: saved?.carbs || mealData.carbs,
-        fat: saved?.fat || mealData.fat,
+        calories: saved?.calories ?? mealData.calories,
+        protein: saved?.protein ?? mealData.protein,
+        carbs: saved?.carbs ?? mealData.carbs,
+        fat: saved?.fat ?? mealData.fat,
         img: saved?.imgUrl || DEFAULT_MEAL_IMAGE
       };
-      setLoggedMeals((prev) => [newMeal, ...prev]);
+      setLoggedMeals(prev => [newMeal, ...prev]);
+      setCurrentCalories(prev => prev + newMeal.calories);
+      setCurrentProtein(prev => prev + newMeal.protein);
+      setCurrentCarbs(prev => prev + newMeal.carbs);
+      setCurrentFat(prev => prev + newMeal.fat);
     } catch (e) {
-      const newMeal = {
+      const fallback = {
         id: `meal-${Date.now()}`,
-        ...mealData,
+        title: mealData.title,
         time: mealData.timeLabel,
+        calories: mealData.calories,
+        protein: mealData.protein,
+        carbs: mealData.carbs,
+        fat: mealData.fat,
         img: DEFAULT_MEAL_IMAGE
       };
-      setLoggedMeals((prev) => [newMeal, ...prev]);
+      setLoggedMeals(prev => [fallback, ...prev]);
+      setCurrentCalories(prev => prev + fallback.calories);
+      setCurrentProtein(prev => prev + fallback.protein);
+      setCurrentCarbs(prev => prev + fallback.carbs);
+      setCurrentFat(prev => prev + fallback.fat);
     }
-
-    setCurrentCalories((prev) => prev + analysisResult.calories);
-    setCurrentProtein((prev) => prev + analysisResult.protein);
-    setCurrentCarbs((prev) => prev + analysisResult.carbs);
-    setCurrentFat((prev) => prev + analysisResult.fat);
-
     setMealInput('');
     setAnalysisResult(null);
     setNutritionSubView('dashboard');
@@ -118,31 +128,19 @@ export function useNutritionState(addTimer) {
   const limitCalories = 2800;
   const calPercent = Math.min(currentCalories / limitCalories, 1);
   const nutritionRingOffset = 603 * (1 - calPercent);
-
   const proteinPct = Math.min((currentProtein / 180) * 100, 100);
   const carbsPct = Math.min((currentCarbs / 250) * 100, 100);
   const fatPct = Math.min((currentFat / 80) * 100, 100);
 
   return {
-    nutritionSubView,
-    setNutritionSubView,
-    currentCalories,
-    currentProtein,
-    currentCarbs,
-    currentFat,
-    mealInput,
-    setMealInput,
-    mealType,
-    setMealType,
-    isAnalyzingMeal,
-    analysisResult,
-    loggedMeals,
-    handleAnalyzeMeal,
-    handleAddMealToLog,
-    limitCalories,
-    nutritionRingOffset,
-    proteinPct,
-    carbsPct,
-    fatPct
+    nutritionSubView, setNutritionSubView,
+    currentCalories, currentProtein, currentCarbs, currentFat,
+    mealInput, setMealInput,
+    mealType, setMealType,
+    isAnalyzingMeal, analysisResult,
+    loggedMeals, isMealsLoading, mealsError,
+    handleAnalyzeMeal, handleAddMealToLog,
+    limitCalories, nutritionRingOffset,
+    proteinPct, carbsPct, fatPct
   };
 }

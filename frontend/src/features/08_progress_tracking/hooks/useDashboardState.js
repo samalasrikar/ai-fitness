@@ -7,13 +7,15 @@ import { workoutApi } from '../../shared/services/workout.api';
 import { aiCoachApi } from '../../shared/services/aicoach.api';
 import { progressApi } from '../../shared/services/progress.api';
 import { authApi } from '../../shared/services/auth.api';
+import { profileApi } from '../../shared/services/profile.api';
 
 export function useDashboardState() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
   const [hasJoinedChallenge, setHasJoinedChallenge] = useState(false);
+  const [streakDays, setStreakDays] = useState(0);
 
-  // Profile state
+  // Profile state — start from localStorage cache, hydrate from API
   const [userProfile, setUserProfile] = useState(() => {
     try {
       const saved = localStorage.getItem('userProfile');
@@ -23,33 +25,44 @@ export function useDashboardState() {
   });
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('userProfile');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.displayName) setUserProfile(parsed);
-      }
-    } catch (e) {}
+    let isMounted = true;
+    profileApi.getProfile()
+      .then((res) => {
+        if (!isMounted || !res.data) return;
+        const p = res.data;
+        const merged = {
+          displayName: p.displayName || `${p.firstName || ''} ${p.lastName || ''}`.trim() || userProfile.displayName,
+          username: p.username || userProfile.username || `@${(p.firstName || 'user').toLowerCase()}_fit`,
+          fitnessLevel: p.fitnessLevel || userProfile.fitnessLevel,
+          weight: p.weight ?? userProfile.weight,
+          heightFt: p.heightFt ?? userProfile.heightFt,
+          heightIn: p.heightIn ?? userProfile.heightIn,
+          age: p.age ?? userProfile.age,
+          gender: p.gender || userProfile.gender
+        };
+        setUserProfile(merged);
+        localStorage.setItem('userProfile', JSON.stringify(merged));
+      })
+      .catch(() => {});
+    return () => { isMounted = false; };
   }, []);
 
-  const firstName = userProfile.displayName ? userProfile.displayName.split(' ')[0] : 'Rahul';
+  const firstName = userProfile.displayName
+    ? userProfile.displayName.split(' ')[0]
+    : (userProfile.firstName || 'Athlete');
 
   // Timers ref for component cleanup
   const timersRef = useRef([]);
-  const addTimer = (id) => {
-    timersRef.current.push(id);
-    return id;
-  };
-
+  const addTimer = (id) => { timersRef.current.push(id); return id; };
   useEffect(() => {
     return () => {
-      timersRef.current.forEach((id) => clearTimeout(id));
+      timersRef.current.forEach(id => clearTimeout(id));
       timersRef.current = [];
     };
   }, []);
 
   // Nutrition state hook
-  const nutritionState = useNutritionState(addTimer);
+  const nutritionState = useNutritionState();
 
   // Chat container ref for auto-scroll
   const chatContainerRef = useRef(null);
@@ -62,21 +75,19 @@ export function useDashboardState() {
   useEffect(() => {
     let isMounted = true;
     workoutApi.getActivePlan()
-      .then((res) => {
-        if (isMounted && res.data) setGeneratedPlan(res.data);
-      })
+      .then(res => { if (isMounted && res.data) setGeneratedPlan(res.data); })
       .catch(() => {});
     return () => { isMounted = false; };
   }, []);
 
-  // Fetch dashboard progress metrics & challenge status on mount
+  // Fetch dashboard progress metrics & challenge/streak status on mount
   useEffect(() => {
     let isMounted = true;
     progressApi.getDashboardMetrics()
-      .then((res) => {
-        if (isMounted && res.data) {
-          setHasJoinedChallenge(Boolean(res.data.hasJoinedChallenge));
-        }
+      .then(res => {
+        if (!isMounted || !res.data) return;
+        setHasJoinedChallenge(Boolean(res.data.hasJoinedChallenge));
+        setStreakDays(res.data.streakDays ?? 0);
       })
       .catch(() => {});
     return () => { isMounted = false; };
@@ -85,18 +96,15 @@ export function useDashboardState() {
   // AI Coach chat state
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
-    { sender: 'coach', text: `Hey ${firstName}! Ready to crush your goals today? Let me know if you want me to generate a personalized routine or review your stats.` }
+    { sender: 'coach', text: `Hey! Ready to crush your goals today? Let me know if you want me to generate a personalized routine or review your stats.` }
   ]);
   const [inputMessage, setInputMessage] = useState('');
 
-  // Fetch chat history on mount
   useEffect(() => {
     let isMounted = true;
     aiCoachApi.getHistory()
-      .then((res) => {
-        if (isMounted && res.data && res.data.length > 0) {
-          setChatMessages(res.data);
-        }
+      .then(res => {
+        if (isMounted && res.data && res.data.length > 0) setChatMessages(res.data);
       })
       .catch(() => {});
     return () => { isMounted = false; };
@@ -111,9 +119,7 @@ export function useDashboardState() {
   // Profile specific states
   const [selectedGoals, setSelectedGoals] = useState(['Muscle Gain', 'Strength Training']);
   const [aiPreferences, setAiPreferences] = useState({
-    workoutGen: true,
-    nutritionInsights: true,
-    recoveryAnalysis: false
+    workoutGen: true, nutritionInsights: true, recoveryAnalysis: false
   });
   const [selectedTheme, setSelectedTheme] = useState('Dark');
   const [logoutState, setLogoutState] = useState('idle');
@@ -125,26 +131,19 @@ export function useDashboardState() {
 
   useEffect(() => {
     if (activeTab === 'home') {
-      const timer = setTimeout(() => {
-        setMuscleOffset(213.628 - (72 / 100) * 213.628);
-        setFatOffset(213.628 - (48 / 100) * 213.628);
+      const t = setTimeout(() => {
+        setMuscleOffset(213.628 - 0.72 * 213.628);
+        setFatOffset(213.628 - 0.48 * 213.628);
       }, 200);
-      return () => clearTimeout(timer);
-    } else {
-      setMuscleOffset(213.628);
-      setFatOffset(213.628);
-    }
+      return () => clearTimeout(t);
+    } else { setMuscleOffset(213.628); setFatOffset(213.628); }
   }, [activeTab]);
 
   useEffect(() => {
     if (activeTab === 'profile') {
-      const timer = setTimeout(() => {
-        setFitnessOffset(175.9 - (88 / 100) * 175.9);
-      }, 200);
-      return () => clearTimeout(timer);
-    } else {
-      setFitnessOffset(175.9);
-    }
+      const t = setTimeout(() => setFitnessOffset(175.9 - 0.88 * 175.9), 200);
+      return () => clearTimeout(t);
+    } else { setFitnessOffset(175.9); }
   }, [activeTab]);
 
   // Count up animations
@@ -163,8 +162,7 @@ export function useDashboardState() {
       if (res.data) setGeneratedPlan(res.data);
     } catch (e) {
       setGeneratedPlan({
-        title: 'Hypertrophy Push A',
-        duration: '45 mins',
+        title: 'Hypertrophy Push A', duration: '45 mins',
         exercises: [
           { name: 'Incline Dumbbell Press', sets: '4x8-10 reps', rpe: 'RPE 8.5' },
           { name: 'Overhead Barbell Press', sets: '3x6-8 reps', rpe: 'RPE 8' },
@@ -179,106 +177,75 @@ export function useDashboardState() {
   };
 
   const handleResetPlan = async () => {
-    try {
-      await workoutApi.resetPlan();
-    } catch (e) {}
+    try { await workoutApi.resetPlan(); } catch (e) {}
     setGeneratedPlan(null);
   };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
-
     const userMsg = inputMessage;
-    setChatMessages((prev) => [...prev, { sender: 'user', text: userMsg }]);
+    setChatMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
     setInputMessage('');
-
     try {
       const res = await aiCoachApi.sendMessage(userMsg);
-      if (res.data) {
-        setChatMessages((prev) => [...prev, { sender: 'coach', text: res.data.text }]);
-      }
-    } catch (err) {
-      let responseText = "That sounds great! Keep pushing hard and let me know if you need any adjustments.";
-      if (userMsg.toLowerCase().includes('plan') || userMsg.toLowerCase().includes('workout')) {
-        responseText = "I highly recommend starting with the 'Hypertrophy Push A' routine today to build upper chest volume. Should I lock that in for you?";
-      }
-      setChatMessages((prev) => [...prev, { sender: 'coach', text: responseText }]);
+      if (res.data) setChatMessages(prev => [...prev, { sender: 'coach', text: res.data.text }]);
+    } catch {
+      let reply = "Keep pushing! Let me know if you need any adjustments.";
+      if (userMsg.toLowerCase().includes('plan') || userMsg.toLowerCase().includes('workout'))
+        reply = "I recommend the 'Hypertrophy Push A' routine today. Should I lock that in?";
+      setChatMessages(prev => [...prev, { sender: 'coach', text: reply }]);
     }
   };
 
   const handleToggleChallenge = async () => {
     const prev = hasJoinedChallenge;
     setHasJoinedChallenge(!prev);
-    try {
-      await progressApi.toggleChallenge();
-    } catch (e) {
-      setHasJoinedChallenge(prev);
-    }
+    try { await progressApi.toggleChallenge(); }
+    catch { setHasJoinedChallenge(prev); }
   };
 
-  const handleToggleGoal = (goal) => {
-    setSelectedGoals(prev => prev.includes(goal) ? prev.filter(g => g !== goal) : [...prev, goal]);
+  const handleToggleGoal = async (goal) => {
+    const next = selectedGoals.includes(goal)
+      ? selectedGoals.filter(g => g !== goal)
+      : [...selectedGoals, goal];
+    setSelectedGoals(next);
+    try { await profileApi.updateGoals(next); } catch {}
   };
 
-  const handleToggleAiPreference = (key) => {
-    setAiPreferences(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+  const handleToggleAiPreference = async (key) => {
+    const next = { ...aiPreferences, [key]: !aiPreferences[key] };
+    setAiPreferences(next);
+    try { await profileApi.updatePreferences(next); } catch {}
   };
 
   const handleSecureLogout = async () => {
     setLogoutState('securing');
-    try {
-      await authApi.logout();
-    } catch (e) {}
+    try { await authApi.logout(); } catch {}
     localStorage.removeItem('accessToken');
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userProfile');
     setLogoutState('closed');
-    const timer = setTimeout(() => {
-      navigate('/login');
-      setLogoutState('idle');
-    }, 1000);
-    addTimer(timer);
+    const t = setTimeout(() => { navigate('/login'); setLogoutState('idle'); }, 1000);
+    addTimer(t);
   };
 
   return {
-    activeTab,
-    setActiveTab,
-    hasJoinedChallenge,
-    setHasJoinedChallenge: handleToggleChallenge,
-    userProfile,
-    firstName,
+    activeTab, setActiveTab,
+    hasJoinedChallenge, setHasJoinedChallenge: handleToggleChallenge,
+    streakDays, userProfile, setUserProfile, firstName,
     chatContainerRef,
-    isGeneratingPlan,
-    generatedPlan,
-    setGeneratedPlan: handleResetPlan,
-    isChatOpen,
-    setIsChatOpen,
-    chatMessages,
-    inputMessage,
-    setInputMessage,
-    selectedGoals,
-    aiPreferences,
-    selectedTheme,
-    setSelectedTheme,
+    isGeneratingPlan, generatedPlan, setGeneratedPlan: handleResetPlan,
+    isChatOpen, setIsChatOpen,
+    chatMessages, inputMessage, setInputMessage,
+    selectedGoals, aiPreferences,
+    selectedTheme, setSelectedTheme,
     logoutState,
-    muscleOffset,
-    fatOffset,
-    fitnessOffset,
-    heartRate,
-    steps,
-    energy,
-    hydration,
-    activeBurn,
-    profileWeight,
-    profileFitnessScore,
-    handleGeneratePlan,
-    handleSendMessage,
-    handleToggleGoal,
-    handleToggleAiPreference,
-    handleSecureLogout,
+    muscleOffset, fatOffset, fitnessOffset,
+    heartRate, steps, energy, hydration, activeBurn,
+    profileWeight, profileFitnessScore,
+    handleGeneratePlan, handleSendMessage,
+    handleToggleGoal, handleToggleAiPreference, handleSecureLogout,
     ...nutritionState
   };
 }

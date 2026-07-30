@@ -10,13 +10,13 @@ export default function AICoachDrawer({
   return (
     <>
       {/* Floating AI Coach Button */}
-      <div className="absolute bottom-20 right-6 z-[60] orb-float">
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[999] pointer-events-none flex justify-end px-6 orb-float">
         <button 
           onClick={() => setIsChatOpen(prev => !prev)}
-          className="relative w-16 h-16 rounded-full cta-gradient ai-glow shadow-2xl flex items-center justify-center transition-transform active:scale-90 group overflow-hidden cursor-pointer"
+          className="pointer-events-auto relative w-14 h-14 rounded-full cta-gradient ai-glow shadow-2xl flex items-center justify-center transition-transform active:scale-90 group overflow-hidden cursor-pointer"
         >
           <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-          <span className="material-symbols-outlined text-black text-3xl font-bold group-hover:scale-110 transition-transform">
+          <span className="material-symbols-outlined text-black text-2xl font-bold group-hover:scale-110 transition-transform">
             {isChatOpen ? 'close' : 'auto_awesome'}
           </span>
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-black rounded-full border-2 border-primary flex items-center justify-center">
@@ -27,7 +27,7 @@ export default function AICoachDrawer({
 
       {/* Floating AI Coach Assistant Chat Drawer */}
       {isChatOpen && (
-        <div className="absolute inset-x-0 bottom-16 z-50 bg-surface-container border-t border-primary/20 rounded-t-[32px] shadow-2xl flex flex-col h-[400px] animate-in slide-in-from-bottom duration-300">
+        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[999] bg-surface-container border-t border-primary/20 rounded-t-[32px] shadow-2xl flex flex-col h-[400px] animate-in slide-in-from-bottom duration-300">
           <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">auto_awesome</span>

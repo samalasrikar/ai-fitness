@@ -1,5 +1,7 @@
 import { DEFAULT_MEAL_IMAGE } from '../constants/dashboardConstants';
 
+const todayLabel = new Date().toLocaleDateString([], { month: 'short', day: 'numeric' });
+
 export default function CaloriesTab({
   nutritionSubView,
   setNutritionSubView,
@@ -14,6 +16,8 @@ export default function CaloriesTab({
   isAnalyzingMeal,
   analysisResult,
   loggedMeals,
+  isMealsLoading,
+  mealsError,
   handleAnalyzeMeal,
   handleAddMealToLog,
   limitCalories,
@@ -31,7 +35,7 @@ export default function CaloriesTab({
           <div className="px-6 flex flex-col gap-1">
             <span className="text-label-caps text-primary uppercase tracking-[0.2em] font-bold">Daily Summary</span>
             <div className="flex items-center justify-between">
-              <h2 className="text-headline-md text-on-surface">Today, Oct 24</h2>
+              <h2 className="text-headline-md text-on-surface">Today, {todayLabel}</h2>
               <div className="flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full">
                 <span className="material-symbols-outlined text-[14px] text-primary">auto_awesome</span>
                 <span className="text-[9px] font-label-caps text-on-surface-variant font-bold">AI SYNCED</span>
@@ -122,12 +126,29 @@ export default function CaloriesTab({
             </div>
 
             <div className="space-y-3">
-              {loggedMeals.map((meal) => (
+              {isMealsLoading && (
+                <div className="flex items-center justify-center py-8 gap-2">
+                  <span className="material-symbols-outlined text-primary text-xl animate-spin">autorenew</span>
+                  <span className="text-xs text-on-surface-variant">Loading meals...</span>
+                </div>
+              )}
+              {!isMealsLoading && mealsError && (
+                <div className="text-center py-6">
+                  <p className="text-xs text-error">{mealsError}</p>
+                </div>
+              )}
+              {!isMealsLoading && !mealsError && loggedMeals.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-8 space-y-3 text-center">
+                  <span className="material-symbols-outlined text-on-surface-variant text-3xl">no_meals</span>
+                  <p className="text-xs text-on-surface-variant">No meals logged today. Tap <strong>+ ADD MEAL</strong> to start tracking.</p>
+                </div>
+              )}
+              {!isMealsLoading && loggedMeals.map((meal) => (
                 <div key={meal.id} className="flex items-center gap-4 bg-surface-container p-4 rounded-xl border border-white/5">
                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-surface-bright flex-shrink-0">
-                    <img 
-                      alt={meal.title} 
-                      className="w-full h-full object-cover" 
+                    <img
+                      alt={meal.title}
+                      className="w-full h-full object-cover"
                       src={meal.img}
                       onError={(e) => { e.currentTarget.src = DEFAULT_MEAL_IMAGE; }}
                     />

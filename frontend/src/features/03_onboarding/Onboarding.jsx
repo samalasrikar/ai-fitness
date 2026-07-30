@@ -38,78 +38,74 @@ export default function Onboarding() {
   } = useOnboarding();
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-on-surface font-body-md flex items-center justify-center selection:bg-primary/30 relative overflow-hidden">
-      {/* Mobile Simulator Viewport */}
-      <div className="w-full max-w-md h-screen bg-[#0A0A0A] flex flex-col relative overflow-hidden border-x border-white/5 shadow-2xl">
+    <div className="w-full flex-1 flex flex-col relative overflow-hidden bg-[#0A0A0A]">
+      {/* Header Progress Bar */}
+      <OnboardingHeader step={step} />
+
+      {/* Scrollable Wizard Canvas */}
+      <main className={`flex-1 overflow-y-auto no-scrollbar flex flex-col px-6 ${step >= 2 && step <= 4 ? 'pt-16 pb-6' : 'py-6'}`}>
+        {step === 1 && <StepOverview onNext={() => setStep(2)} />}
         
-        {/* Header Progress Bar */}
-        <OnboardingHeader step={step} />
+        {step === 2 && (
+          <StepPersonalDetails
+            gender={gender}
+            setGender={setGender}
+            age={age}
+            setAge={setAge}
+            weight={weight}
+            setWeight={setWeight}
+            heightFt={heightFt}
+            setHeightFt={setHeightFt}
+            heightIn={heightIn}
+            setHeightIn={setHeightIn}
+            onNext={() => setStep(3)}
+            onBack={() => setStep(1)}
+          />
+        )}
 
-        {/* Scrollable Wizard Canvas */}
-        <main className={`flex-1 overflow-y-auto no-scrollbar flex flex-col px-6 ${step >= 2 && step <= 4 ? 'pt-16 pb-6' : 'py-6'}`}>
-          {step === 1 && <StepOverview onNext={() => setStep(2)} />}
-          
-          {step === 2 && (
-            <StepPersonalDetails
-              gender={gender}
-              setGender={setGender}
-              age={age}
-              setAge={setAge}
-              weight={weight}
-              setWeight={setWeight}
-              heightFt={heightFt}
-              setHeightFt={setHeightFt}
-              heightIn={heightIn}
-              setHeightIn={setHeightIn}
-              onNext={() => setStep(3)}
-              onBack={() => setStep(1)}
-            />
-          )}
+        {step === 3 && (
+          <StepPreferences
+            fitnessLevel={fitnessLevel}
+            setFitnessLevel={setFitnessLevel}
+            frequency={frequency}
+            setFrequency={setFrequency}
+            location={location}
+            setLocation={setLocation}
+            duration={duration}
+            setDuration={setDuration}
+            onNext={() => setStep(4)}
+            onBack={() => setStep(2)}
+          />
+        )}
 
-          {step === 3 && (
-            <StepPreferences
-              fitnessLevel={fitnessLevel}
-              setFitnessLevel={setFitnessLevel}
-              frequency={frequency}
-              setFrequency={setFrequency}
-              location={location}
-              setLocation={setLocation}
-              duration={duration}
-              setDuration={setDuration}
-              onNext={() => setStep(4)}
-              onBack={() => setStep(2)}
-            />
-          )}
+        {step === 4 && (
+          <StepFitnessGoals
+            selectedGoal={selectedGoal}
+            setSelectedGoal={setSelectedGoal}
+            onNext={() => setStep(5)}
+            onBack={() => setStep(3)}
+          />
+        )}
 
-          {step === 4 && (
-            <StepFitnessGoals
-              selectedGoal={selectedGoal}
-              setSelectedGoal={setSelectedGoal}
-              onNext={() => setStep(5)}
-              onBack={() => setStep(3)}
-            />
-          )}
+        {step === 5 && (
+          <StepAIPersonalization
+            statusText={statusText}
+            progress={progress}
+            tickerIndex={tickerIndex}
+          />
+        )}
 
-          {step === 5 && (
-            <StepAIPersonalization
-              statusText={statusText}
-              progress={progress}
-              tickerIndex={tickerIndex}
-            />
-          )}
+        {step === 6 && (
+          <StepFinalProtocol onFinish={handleFinishOnboarding} />
+        )}
+      </main>
 
-          {step === 6 && (
-            <StepFinalProtocol onFinish={handleFinishOnboarding} />
-          )}
-        </main>
-
-        {/* Footer Identity */}
-        <footer className="py-6 px-6 text-center">
-          <p className="text-[9px] font-bold text-on-surface-variant/30 uppercase tracking-[0.25em]">
-            POWERED BY FITAI NEURAL CORE v4.0
-          </p>
-        </footer>
-      </div>
+      {/* Footer Identity */}
+      <footer className="py-6 px-6 text-center">
+        <p className="text-[9px] font-bold text-on-surface-variant/30 uppercase tracking-[0.25em]">
+          POWERED BY FITAI NEURAL CORE v4.0
+        </p>
+      </footer>
     </div>
   );
 }
