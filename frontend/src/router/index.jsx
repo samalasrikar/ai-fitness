@@ -28,6 +28,10 @@ const router = createBrowserRouter([
         path: '/setup',
         element: <Onboarding />,
       },
+      {
+        path: '/onboarding',
+        element: <Onboarding />,
+      },
     ],
   },
 ]);

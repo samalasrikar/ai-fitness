@@ -87,7 +87,7 @@ export function useDashboardState() {
       .then(res => {
         if (!isMounted || !res.data) return;
         setHasJoinedChallenge(Boolean(res.data.hasJoinedChallenge));
-        setStreakDays(res.data.streakDays ?? 0);
+        setStreakDays(res.data.activeStreak ?? res.data.streakDays ?? 0);
       })
       .catch(() => {});
     return () => { isMounted = false; };
