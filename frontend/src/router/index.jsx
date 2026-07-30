@@ -1,15 +1,13 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
-import LandingOrDashboard from '../components/LandingOrDashboard';
-import FitXAIDashboard from '../components/FitXAIDashboard';
-import OnboardingWizard from '../components/OnboardingWizard';
-import Login from '../components/Login';
-import Signup from '../components/Signup';
+import { Landing, Login, Signup } from '@features/01_auth';
+import { Onboarding } from '@features/03_onboarding';
+import { Dashboard } from '@features/08_progress_tracking';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <LandingOrDashboard />,
+    element: <Landing />,
   },
   {
     path: '/login',
@@ -24,11 +22,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/dashboard',
-        element: <FitXAIDashboard />,
+        element: <Dashboard />,
       },
       {
         path: '/setup',
-        element: <OnboardingWizard />,
+        element: <Onboarding />,
       },
     ],
   },

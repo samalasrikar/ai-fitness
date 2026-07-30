@@ -72,7 +72,7 @@
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
-  font-family: "Manrope", sans-serif;
+  font-family: Manrope, sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -83,7 +83,7 @@ body {
   line-height: 40px;
   letter-spacing: -0.02em;
   font-weight: 800;
-  font-family: "Manrope", sans-serif;
+  font-family: Manrope, sans-serif;
 }
 
 .text-display-lg {
@@ -91,7 +91,7 @@ body {
   line-height: 56px;
   letter-spacing: -0.02em;
   font-weight: 800;
-  font-family: "Manrope", sans-serif;
+  font-family: Manrope, sans-serif;
 }
 
 .text-data-lg {
@@ -99,35 +99,35 @@ body {
   line-height: 32px;
   letter-spacing: -0.01em;
   font-weight: 600;
-  font-family: "JetBrains Mono", monospace;
+  font-family: JetBrains Mono, monospace;
 }
 
 .text-headline-md {
   font-size: 24px;
   line-height: 32px;
   font-weight: 700;
-  font-family: "Manrope", sans-serif;
+  font-family: Manrope, sans-serif;
 }
 
 .text-body-lg {
   font-size: 18px;
   line-height: 28px;
   font-weight: 400;
-  font-family: "Manrope", sans-serif;
+  font-family: Manrope, sans-serif;
 }
 
 .text-body-md {
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
-  font-family: "Manrope", sans-serif;
+  font-family: Manrope, sans-serif;
 }
 
 .text-data-sm {
   font-size: 14px;
   line-height: 20px;
   font-weight: 500;
-  font-family: "JetBrains Mono", monospace;
+  font-family: JetBrains Mono, monospace;
 }
 
 .text-label-caps {
@@ -136,7 +136,7 @@ body {
   letter-spacing: 0.1em;
   font-weight: 600;
   text-transform: uppercase;
-  font-family: "Manrope", sans-serif;
+  font-family: Manrope, sans-serif;
 }
 
 /* Custom CSS classes from Stitch */
@@ -225,7 +225,7 @@ body {
 }
 
 @keyframes ring-pulse {
-  0 {
+  0% {
     box-shadow: 0 0 0 0 rgba(245, 196, 0, 0.4);
   }
   100% {

@@ -1,44 +1,38 @@
 import { Server as HttpServer } from 'http';
-import { Server as SocketIOServer, ServerOptions } from 'socket.io';
+import * as socketio from 'socket.io';
 import { env } from '../env';
 import { logger } from './logger';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Socket.IO Configuration
-// Event handlers and room implementations will occur in future phases
-// ─────────────────────────────────────────────────────────────────────────────
+let io: any = null;
 
-let io: SocketIOServer | null = null;
+export function initializeSocket(httpServer: HttpServer): any {
+  const ServerClass = (socketio as any).Server || socketio;
+  io = new ServerClass(httpServer, {
+    cors: {
+      origin: env.CORS_ORIGIN.split(',').map((o) => o.trim()),
+      credentials: true,
+      methods: ['GET', 'POST'],
+    },
+    transports: ['websocket', 'polling'],
+    pingTimeout: 60000,
+    pingInterval: 25000,
+  });
 
-const socketOptions: Partial<ServerOptions> = {
-  cors: {
-    origin: env.CORS_ORIGIN.split(',').map((o) => o.trim()),
-    credentials: true,
-    methods: ['GET', 'POST'],
-  },
-  transports: ['websocket', 'polling'],
-  pingTimeout: 60000,
-  pingInterval: 25000,
-};
-
-export function initializeSocket(httpServer: HttpServer): SocketIOServer {
-  io = new SocketIOServer(httpServer, socketOptions);
-
-  io.on('connection', (socket) => {
+  io.on('connection', (socket: any) => {
     logger.info(`Socket.IO: Client connected [id=${socket.id}]`);
 
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', (reason: string) => {
       logger.info(`Socket.IO: Client disconnected [id=${socket.id}] reason=${reason}`);
     });
   });
 
-  logger.info('✅ Socket.IO initialized. Event implementations pending future phases.');
+  logger.info('✅ Socket.IO initialized.');
   return io;
 }
 
-export function getSocketIO(): SocketIOServer {
+export function getSocketIO(): any {
   if (!io) {
-    throw new Error('Socket.IO has not been initialized. Call initializeSocket() first.');
+    throw new Error('Socket.IO has not been initialized.');
   }
   return io;
 }
