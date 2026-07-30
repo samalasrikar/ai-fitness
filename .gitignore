@@ -1,7 +1,8 @@
 # Root gitignore for FitAI X
 
-# Dependencies across packages
+# Dependencies across all packages and subdirectories
 node_modules/
+**/node_modules/
 
 # Build outputs
 dist/
@@ -11,9 +12,11 @@ backend/dist/
 
 # Environment files
 .env
-backend/.env
 .env.local
 *.env.local
+backend/.env
+frontend/.env
+frontend/.env.local
 
 # Logs
 logs/

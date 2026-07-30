@@ -1,11 +1,18 @@
 import { Router } from 'express';
 import { ProgressController } from './progress.controller';
-import { authenticateToken } from '../01_auth/auth.middleware';
+import { authenticate } from '../01_auth/auth.middleware';
 
 const router = Router();
 const controller = new ProgressController();
 
-router.get('/dashboard', authenticateToken, controller.getMetrics);
-router.post('/challenge/toggle', authenticateToken, controller.toggleChallenge);
+router.use(authenticate);
+
+router.get('/dashboard', controller.getMetrics);
+router.post('/challenge/toggle', controller.toggleChallenge);
+
+router.get('/records/summary', controller.getRecordsSummary);
+router.get('/records', controller.getPersonalRecords);
+router.post('/records', controller.createPersonalRecord);
+router.delete('/records/:id', controller.deletePersonalRecord);
 
 export const progressRouter = router;

@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+**/node_modules/
 
 # Production build output
 dist/
@@ -26,30 +27,12 @@ uploads/
 tmp/
 temp/
 
-# Diagnostic reports
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
 # Coverage directory
 coverage/
 .nyc_output/
 
-# TypeScript / IDE / Editor settings
-*.tsbuildinfo
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# OS generated files
+# OS and Editor files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
+.vscode/
+.idea/

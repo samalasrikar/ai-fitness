@@ -22,6 +22,7 @@ export default function Dashboard() {
     mealInput, setMealInput, mealType, setMealType,
     isAnalyzingMeal, analysisResult,
     loggedMeals, isMealsLoading, mealsError,
+    handleDeleteMeal, lastSyncTime,
     selectedGoals, aiPreferences,
     selectedTheme, setSelectedTheme,
     logoutState,
@@ -79,11 +80,9 @@ export default function Dashboard() {
             mealsError={mealsError}
             handleAnalyzeMeal={handleAnalyzeMeal}
             handleAddMealToLog={handleAddMealToLog}
+            handleDeleteMeal={handleDeleteMeal}
             limitCalories={limitCalories}
-            nutritionRingOffset={nutritionRingOffset}
-            proteinPct={proteinPct}
-            carbsPct={carbsPct}
-            fatPct={fatPct}
+            lastSyncTime={lastSyncTime}
           />
         )}
 

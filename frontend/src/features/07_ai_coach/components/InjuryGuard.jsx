@@ -1,25 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import BottomNav from './BottomNav';
+import { useAICoach } from '../../../hooks/useAICoach';
 
 const BODY_PARTS = ['Right Knee', 'Left Shoulder', 'Lower Back (L4/L5)', 'Neck', 'Right Hip', 'Left Ankle'];
 
 export default function InjuryGuard() {
   const navigate = useNavigate();
+  const { injuryGuardStatus, loading, error, fetchInjuryGuard, logInjury } = useAICoach();
   const [severity, setSeverity] = useState(4);
   const [bodyPart, setBodyPart] = useState('Right Knee');
+  const [notes, setNotes] = useState('');
   const [saved, setSaved] = useState(false);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  useEffect(() => {
+    fetchInjuryGuard();
+  }, [fetchInjuryGuard]);
+
+  const handleSave = async () => {
+    try {
+      await logInjury({ bodyPart, discomfortLevel: severity, notes });
+      setSaved(true);
+      setNotes('');
+      setTimeout(() => setSaved(false), 3000);
+    } catch (_) {}
   };
 
-  // Circle math for safety ring (r=70 → circumference ≈ 440)
   const circumference = 2 * Math.PI * 70;
-  const safetyPct = 1.0; // 100%
-  const dashOffset = circumference * (1 - safetyPct);
+  const safetyScore = injuryGuardStatus?.activeAlerts?.length > 0 ? 80 : 100;
+  const dashOffset = circumference * (1 - safetyScore / 100);
 
   return (
     <div className="w-full flex-1 flex flex-col bg-[#131313] min-h-screen pb-32 text-[#e5e2e1]">
@@ -27,22 +37,25 @@ export default function InjuryGuard() {
       <header className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 bg-[#131313]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl h-16">
         <div className="flex items-center justify-between px-6 h-full">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full overflow-hidden border border-[#f5c400]/20">
-              <img
-                className="w-full h-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzWywleEEZNt3O6p42e2yGNkkrobZzPVjAQXrKwQYLJ47ZNoUGPs8t4XJByRl2z7xl-r5je1p7_kNb1DvaonV6Ej9fWMquLvKnXwkCa1gtaElcKvXqcyypOBBE284Rr_H3iOzj0pCAfoPfX8CgdAvIYX0kTLxw4SAxfakAVGZUq_Lx_o_2RXAOg-NZOzMcV7OZcU2YjgpBkOvCZoAVOHD-zzm-303Unjef50OF0a0z9yNTkiBk6fvl_Q"
-                alt="Profile"
-              />
-            </div>
+            <button onClick={() => navigate(-1)} className="text-[#e5e2e1] hover:text-white transition-colors cursor-pointer">
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
             <h1 className="text-[22px] font-extrabold text-[#f5c400] tracking-tight font-[Manrope]">FITAIX</h1>
           </div>
-          <button className="text-[#d1c5ab]/60 hover:text-white transition-colors active:scale-95">
-            <span className="material-symbols-outlined text-3xl">settings_heart</span>
+          <button onClick={() => navigate('/dashboard')} className="text-[#d1c5ab]/60 hover:text-white transition-colors">
+            <span className="material-symbols-outlined text-2xl">settings_heart</span>
           </button>
         </div>
       </header>
 
       <main className="pt-20 px-6 space-y-6 max-w-[430px] mx-auto w-full">
+        {loading && (
+          <div className="flex items-center justify-center py-6 gap-2">
+            <span className="material-symbols-outlined text-[#f5c400] text-xl animate-spin">autorenew</span>
+            <span className="text-xs text-[#d1c5ab]">Scanning biomechanical risks...</span>
+          </div>
+        )}
+
         {/* Safety Score Ring */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -60,18 +73,15 @@ export default function InjuryGuard() {
             <span className="material-symbols-outlined text-[#f5c400]/30 text-4xl">shield_with_heart</span>
           </div>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-[#d1c5ab] mb-5">
-            Current Safety Score
+            Current Joint Safety Score
           </span>
           <div className="relative w-36 h-36 flex justify-center items-center">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
-              <circle
-                cx="80" cy="80" r="70"
-                fill="transparent"
-                stroke="rgba(42,42,42,1)"
-                strokeWidth="8"
-              />
+              <circle cx="80" cy="80" r="70" fill="transparent" stroke="rgba(42,42,42,1)" strokeWidth="8" />
               <motion.circle
-                cx="80" cy="80" r="70"
+                cx="80"
+                cy="80"
+                r="70"
                 fill="transparent"
                 stroke="#f5c400"
                 strokeWidth="8"
@@ -83,161 +93,87 @@ export default function InjuryGuard() {
               />
             </svg>
             <div className="absolute flex flex-col items-center">
-              <span className="text-4xl font-extrabold text-[#f5c400] leading-none">100%</span>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-[#d1c5ab] mt-1">Optimized</span>
+              <span className="text-4xl font-extrabold text-[#f5c400] leading-none">{safetyScore}%</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-[#d1c5ab] mt-1">
+                {safetyScore === 100 ? 'Optimized' : 'Protected'}
+              </span>
             </div>
           </div>
         </motion.div>
 
-        {/* AI Detected Analysis Card */}
-        <motion.div
-          initial={{ opacity: 0, x: -16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-          className="rounded-xl p-5 border-l-4 border-[#f5c400] relative"
-          style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(245,196,0,0.06) 0%, transparent 70%), rgba(32,31,31,0.7)',
-            backdropFilter: 'blur(24px)',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          <h3 className="text-lg font-bold text-[#f5c400] mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined">psychology</span>
-            AI Detected Analysis
-          </h3>
-          <p className="text-base text-[#e5e2e1] mb-4 italic">
-            "Stabilized spine with targeted quad hypertrophy."
-          </p>
-          <div className="flex flex-col gap-3">
-            {/* Swapped exercise */}
-            <div
-              className="flex items-center justify-between p-3 rounded-lg border border-white/5 line-through opacity-50"
-              style={{ background: 'rgba(28,27,27,1)' }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[#d1c5ab]">fitness_center</span>
-                <span className="text-sm">Barbell Squat</span>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#d1c5ab]">SWAPPED</span>
-            </div>
-            {/* Recommended exercise */}
-            <div
-              className="flex items-center justify-between p-3 rounded-lg border border-[#f5c400]/30"
-              style={{ background: 'rgba(245,196,0,0.08)' }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[#f5c400]">dynamic_form</span>
-                <span className="text-sm font-bold text-[#f5c400]">Leg Press (45°)</span>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#f5c400]">RECOMMENDED</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* User Reported Card */}
-        <motion.div
-          initial={{ opacity: 0, x: 16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-          className="rounded-xl p-5 border-l-4 border-[#fff0c4] relative"
-          style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(245,196,0,0.06) 0%, transparent 70%), rgba(32,31,31,0.7)',
-            backdropFilter: 'blur(24px)',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          <h3 className="text-lg font-bold text-[#fff0c4] mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined">edit_note</span>
-            User Reported
-          </h3>
-          <div className="flex flex-col gap-4">
-            {/* Body Part Select */}
-            <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-semibold uppercase tracking-widest text-[#d1c5ab]">
-                Select Body Part
-              </label>
-              <select
-                value={bodyPart}
-                onChange={(e) => setBodyPart(e.target.value)}
-                className="bg-[#1c1b1b] border border-white/5 rounded-lg px-4 py-3 text-[#e5e2e1] text-sm font-medium focus:border-[#f5c400] outline-none transition-colors cursor-pointer"
-              >
-                {BODY_PARTS.map((bp) => (
-                  <option key={bp}>{bp}</option>
-                ))}
-              </select>
-            </div>
-            {/* Severity Slider */}
-            <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-semibold uppercase tracking-widest text-[#d1c5ab]">
-                Severity (1–10)
-              </label>
-              <div className="flex items-center gap-4">
-                <input
-                  type="range"
-                  min={1}
-                  max={10}
-                  value={severity}
-                  onChange={(e) => setSeverity(Number(e.target.value))}
-                  className="flex-1 h-2 rounded-full cursor-pointer accent-[#f5c400]"
-                  style={{ background: `linear-gradient(to right, #f5c400 ${(severity - 1) * 11.11}%, #2a2a2a ${(severity - 1) * 11.11}%)` }}
-                />
-                <span className="text-sm font-bold text-[#fff0c4] font-[JetBrains_Mono,monospace] w-8 text-right">
-                  {severity}/10
-                </span>
-              </div>
-            </div>
-            {/* Save Button */}
-            <button
-              onClick={handleSave}
-              className={`w-full py-3 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all active:scale-95 ${
-                saved
-                  ? 'bg-[#f5c400]/20 text-[#f5c400] border border-[#f5c400]/30'
-                  : 'bg-[#2a2a2a] hover:bg-[#353534] text-[#e5e2e1] border border-white/5'
-              }`}
-            >
-              {saved ? '✓ Saved' : 'Save Manual Entry'}
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Physiological Impact */}
-        <div
-          className="rounded-xl p-4"
-          style={{
-            background: 'rgba(32,31,31,0.7)',
-            backdropFilter: 'blur(24px)',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          <h4 className="text-[10px] font-semibold uppercase tracking-widest text-[#d1c5ab] mb-3">
-            Physiological Impact
-          </h4>
-          <div className="flex items-center gap-3">
-            <div className="flex-1 bg-[#2a2a2a] h-2 rounded-full overflow-hidden">
-              <motion.div
-                className="bg-[#f5c400] h-full rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: '85%' }}
-                transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
-              />
-            </div>
-            <span className="text-[11px] font-medium text-[#f5c400] font-[JetBrains_Mono,monospace] shrink-0">
-              85% Reduced Spinal Compression
+        {/* Form to Log Discomfort */}
+        <section className="space-y-4 rounded-xl p-5 border border-white/10 bg-[#201f1f]/80">
+          <div className="flex items-center gap-2 text-[#f5c400]">
+            <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+              medical_services
             </span>
+            <h3 className="text-xs font-bold uppercase tracking-wider">Log Area Discomfort</h3>
           </div>
-        </div>
 
-        {/* Apply CTA */}
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={() => navigate('/workout/assistant')}
-          className="w-full py-4 rounded-full bg-[#f5c400] text-black font-bold text-base shadow-lg shadow-[#f5c400]/20 hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-            shield_check
-          </span>
-          Apply Recommended Shift
-        </motion.button>
+          <div>
+            <label className="text-[10px] font-bold text-[#d1c5ab] uppercase tracking-wider block mb-1.5">Target Body Part</label>
+            <select
+              value={bodyPart}
+              onChange={(e) => setBodyPart(e.target.value)}
+              className="w-full bg-[#131313] border border-white/10 rounded-xl px-4 py-3 text-xs text-[#e5e2e1] focus:border-[#f5c400] outline-none"
+            >
+              {BODY_PARTS.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-[10px] font-bold text-[#d1c5ab] uppercase tracking-wider">Discomfort Level (1-10)</label>
+              <span className="text-xs font-bold text-[#f5c400] font-[JetBrains_Mono,monospace]">{severity}</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="10"
+              value={severity}
+              onChange={(e) => setSeverity(Number(e.target.value))}
+              className="w-full accent-[#f5c400] cursor-pointer"
+            />
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold text-[#d1c5ab] uppercase tracking-wider block mb-1.5">Notes (Optional)</label>
+            <input
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. Mild tendon tightness during squat lockout"
+              className="w-full bg-[#131313] border border-white/10 rounded-xl px-4 py-3 text-xs text-[#e5e2e1] placeholder:text-[#d1c5ab]/30 focus:border-[#f5c400] outline-none"
+            />
+          </div>
+
+          <button
+            onClick={handleSave}
+            className="w-full py-3.5 bg-[#f5c400] text-black font-bold text-xs uppercase tracking-wider rounded-xl hover:brightness-105 active:scale-[0.98] transition-all cursor-pointer"
+          >
+            {saved ? '✓ Discomfort Saved to AI Core' : 'Submit Discomfort Report'}
+          </button>
+        </section>
+
+        {/* Logged Alerts */}
+        {injuryGuardStatus?.activeAlerts?.length > 0 && (
+          <section className="space-y-3">
+            <h3 className="text-xs font-bold text-[#f5c400] uppercase tracking-wider">Active Protective Adjustments</h3>
+            {injuryGuardStatus.activeAlerts.map((a) => (
+              <div key={a.id} className="p-4 rounded-xl border border-[#f5c400]/20 bg-[#f5c400]/5 flex items-start gap-3">
+                <span className="material-symbols-outlined text-[#f5c400] text-lg">warning</span>
+                <div>
+                  <h4 className="text-xs font-bold text-[#e5e2e1]">{a.bodyPart} (Severity: {a.severity}/10)</h4>
+                  <p className="text-[11px] text-[#d1c5ab] mt-0.5">{a.recommendation}</p>
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
       </main>
 
       <BottomNav activeId="workout" />

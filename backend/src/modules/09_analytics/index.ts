@@ -1,2 +1,4 @@
-// Placeholder barrel export for module
-export {};
+export * from './analytics.routes';
+export * from './analytics.controller';
+export * from './analytics.service';
+export * from './analytics.types';
