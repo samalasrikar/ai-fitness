@@ -24,9 +24,9 @@ db.on('error', (err) => {
 export async function checkDatabaseConnection(): Promise<void> {
   try {
     const client = await db.connect();
-    const result = await client.query('SELECT NOW()');
-    
-    // Auto-initialize base auth schema
+    await client.query('SELECT NOW()');
+
+    // Auto-initialize base auth and progress tracking schemas
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -58,25 +58,8 @@ export async function checkDatabaseConnection(): Promise<void> {
         target_weight_kg NUMERIC(5,2),
         fitness_goal VARCHAR(50) NOT NULL,
         activity_level VARCHAR(50) NOT NULL,
-        experience_level VARCHAR(50) NOT NULL,
-        dietary_preference VARCHAR(100),
-        medical_conditions TEXT[],
-        bmr NUMERIC(7,2),
-        tdee NUMERIC(7,2),
-        target_calories NUMERIC(7,2),
-        target_protein_g NUMERIC(7,2),
-        target_carbs_g NUMERIC(7,2),
-        target_fat_g NUMERIC(7,2),
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-
-      CREATE TABLE IF NOT EXISTS onboarding_protocols (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        gender VARCHAR(30),
-        age INT,
-        weight NUMERIC(5,2),
+        display_name VARCHAR(150),
+        username VARCHAR(100),
         height_ft INT,
         height_in INT,
         fitness_level VARCHAR(50),
@@ -113,41 +96,86 @@ export async function checkDatabaseConnection(): Promise<void> {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      CREATE TABLE IF NOT EXISTS ai_chat_messages (
+      CREATE TABLE IF NOT EXISTS personal_records (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        sender VARCHAR(20) NOT NULL,
-        text TEXT NOT NULL,
+        exercise_name VARCHAR(150) NOT NULL,
+        record_value NUMERIC(8,2) NOT NULL,
+        previous_best NUMERIC(8,2),
+        unit VARCHAR(20) DEFAULT 'kg',
+        category VARCHAR(50) DEFAULT 'Strength',
+        achieved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS workout_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(150) NOT NULL,
+        duration_seconds INT NOT NULL DEFAULT 0,
+        total_volume_kg NUMERIC(10,2) DEFAULT 0,
+        calories_burned INT DEFAULT 0,
+        rpe_avg NUMERIC(4,2) DEFAULT 8.0,
+        ai_feedback TEXT,
+        rating INT DEFAULT 5,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      CREATE TABLE IF NOT EXISTS user_streaks (
+      CREATE TABLE IF NOT EXISTS workout_session_sets (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        active_days_count INT DEFAULT 14,
-        has_joined_challenge BOOLEAN DEFAULT false,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        session_id UUID NOT NULL REFERENCES workout_sessions(id) ON DELETE CASCADE,
+        exercise_name VARCHAR(150) NOT NULL,
+        set_number INT NOT NULL,
+        weight_kg NUMERIC(8,2) NOT NULL,
+        reps INT NOT NULL,
+        rpe NUMERIC(4,2) DEFAULT 8.0,
+        completed BOOLEAN DEFAULT true,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-      CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id);
-      CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles(user_id);
-      CREATE INDEX IF NOT EXISTS idx_workout_plans_user ON workout_plans(user_id);
-      CREATE INDEX IF NOT EXISTS idx_meal_logs_user ON meal_logs(user_id);
-      CREATE INDEX IF NOT EXISTS idx_ai_chat_messages_user ON ai_chat_messages(user_id);
+      CREATE TABLE IF NOT EXISTS workout_templates (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(150) NOT NULL,
+        category VARCHAR(50) DEFAULT 'Custom',
+        estimated_duration_min INT DEFAULT 45,
+        difficulty VARCHAR(50) DEFAULT 'Intermediate',
+        exercises JSONB NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS meal_plans (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(150) NOT NULL,
+        target_calories INT NOT NULL,
+        diet_type VARCHAR(50) DEFAULT 'Balanced',
+        meals JSONB NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS water_logs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        amount_ml INT NOT NULL,
+        logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
+    // Clean up old sample seed meals from database table
+    await client.query(`
+      DELETE FROM meal_logs 
+      WHERE title IN ('Post-Workout Oatmeal & Whey', 'Grilled Chicken Breast & Quinoa');
+    `).catch(() => {});
+
     client.release();
-    logger.info(`✅ PostgreSQL connected & schemas verified at ${result.rows[0].now}`);
+    logger.info('✅ PostgreSQL connection pool initialized and schema verified');
   } catch (error) {
-    logger.error('❌ PostgreSQL connection failed:', error);
-    logger.error('Please verify your DATABASE_URL in .env and ensure PostgreSQL is accessible.');
+    logger.error('❌ Failed to connect to PostgreSQL database:', error);
     throw error;
   }
 }
 
 export async function disconnectDatabase(): Promise<void> {
   await db.end();
-  logger.info('PostgreSQL pool connection closed.');
+  logger.info('PostgreSQL connection pool closed.');
 }

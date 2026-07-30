@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DEFAULT_USER_PROFILE } from '../constants/dashboardConstants';
 import { useCountUp } from './useCountUp';
 import { useNutritionState } from './useNutritionState';
-import { workoutApi } from '../../shared/services/workout.api';
+import { workoutApi } from '../../../services/api/workout.api';
 import { aiCoachApi } from '../../shared/services/aicoach.api';
 import { progressApi } from '../../shared/services/progress.api';
 import { authApi } from '../../shared/services/auth.api';

@@ -17,10 +17,8 @@ export default function Onboarding() {
     setAge,
     weight,
     setWeight,
-    heightFt,
-    setHeightFt,
-    heightIn,
-    setHeightIn,
+    heightCm,
+    setHeightCm,
     fitnessLevel,
     setFitnessLevel,
     frequency,
@@ -34,6 +32,8 @@ export default function Onboarding() {
     progress,
     statusText,
     tickerIndex,
+    isSubmitting,
+    submitError,
     handleFinishOnboarding
   } = useOnboarding();
 
@@ -54,10 +54,8 @@ export default function Onboarding() {
             setAge={setAge}
             weight={weight}
             setWeight={setWeight}
-            heightFt={heightFt}
-            setHeightFt={setHeightFt}
-            heightIn={heightIn}
-            setHeightIn={setHeightIn}
+            heightCm={heightCm}
+            setHeightCm={setHeightCm}
             onNext={() => setStep(3)}
             onBack={() => setStep(1)}
           />
@@ -96,7 +94,18 @@ export default function Onboarding() {
         )}
 
         {step === 6 && (
-          <StepFinalProtocol onFinish={handleFinishOnboarding} />
+          <StepFinalProtocol
+            selectedGoal={selectedGoal}
+            fitnessLevel={fitnessLevel}
+            frequency={frequency}
+            weight={weight}
+            heightCm={heightCm}
+            location={location}
+            duration={duration}
+            isSubmitting={isSubmitting}
+            submitError={submitError}
+            onFinish={handleFinishOnboarding}
+          />
         )}
       </main>
 

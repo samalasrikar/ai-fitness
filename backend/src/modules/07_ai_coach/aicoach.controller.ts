@@ -26,4 +26,43 @@ export class AICoachController {
       next(error);
     }
   };
+
+  public generateWorkout = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.userId;
+      const plan = await this.service.generateAIWorkout(userId, req.body);
+      res.status(201).json(ApiResponse.created('AI workout plan generated', plan));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getInjuryGuard = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.userId;
+      const status = await this.service.getInjuryGuard(userId);
+      res.status(200).json(ApiResponse.success('Injury guard status retrieved', status));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public logInjury = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.userId;
+      const log = await this.service.logInjury(userId, req.body);
+      res.status(201).json(ApiResponse.created('Injury log saved', log));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getExerciseAnalysis = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const analysis = await this.service.getExerciseAnalysis(req.query.exerciseId as string);
+      res.status(200).json(ApiResponse.success('Exercise analysis retrieved', analysis));
+    } catch (error) {
+      next(error);
+    }
+  };
 }

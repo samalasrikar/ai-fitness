@@ -2,7 +2,13 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { Landing, Login, Signup } from '@features/01_auth';
 import { Onboarding } from '@features/03_onboarding';
-import { Dashboard } from '@features/08_progress_tracking';
+import DashboardLayout from '../layouts/DashboardLayout';
+import DashboardHome from '../features/08_progress_tracking/routes/DashboardHome';
+import DashboardCalories from '../features/08_progress_tracking/routes/DashboardCalories';
+import DashboardMealAI from '../features/08_progress_tracking/routes/DashboardMealAI';
+import DashboardWorkout from '../features/08_progress_tracking/routes/DashboardWorkout';
+import DashboardRecords from '../features/08_progress_tracking/routes/DashboardRecords';
+import DashboardProfile from '../features/08_progress_tracking/routes/DashboardProfile';
 
 import {
   FitAIAssistant,
@@ -41,7 +47,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/dashboard',
-        element: <Dashboard />,
+        element: <DashboardLayout />,
+        children: [
+          { index: true, element: <DashboardHome /> },
+          { path: 'calories', element: <DashboardCalories /> },
+          { path: 'meal-ai', element: <DashboardMealAI /> },
+          { path: 'workout', element: <DashboardWorkout /> },
+          { path: 'records', element: <DashboardRecords /> },
+          { path: 'profile', element: <DashboardProfile /> },
+        ],
       },
       {
         path: '/setup',
@@ -50,6 +64,7 @@ const router = createBrowserRouter([
       {
         path: '/onboarding',
         element: <Onboarding />,
+      },
       // Workout / AI Coach Pages
       {
         path: '/workout/home',

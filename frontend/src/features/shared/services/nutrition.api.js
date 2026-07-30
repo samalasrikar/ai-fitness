@@ -1,13 +1,10 @@
 import { apiClient } from '../../../lib/axios';
 
 export const nutritionApi = {
-  getLoggedMeals: async () => {
-    return apiClient.get('/nutrition/meals');
-  },
-  analyzeMeal: async (mealText) => {
-    return apiClient.post('/nutrition/analyze', { mealText });
-  },
-  logMeal: async (mealData) => {
-    return apiClient.post('/nutrition/log', mealData);
-  }
+  getSummary: () => apiClient.get('/nutrition/summary'),
+  getLoggedMeals: () => apiClient.get('/nutrition/meals'),
+  logMeal: (mealData) => apiClient.post('/nutrition/meals', mealData),
+  deleteMeal: (id) => apiClient.delete(`/nutrition/meals/${id}`),
+  analyzeMeal: (description) => apiClient.post('/nutrition/analyze', { description }),
+  getRecommendations: () => apiClient.post('/nutrition/recommendations'),
 };

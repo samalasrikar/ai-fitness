@@ -38,3 +38,5 @@ export function authenticateToken(
     throw ApiError.unauthorized('Invalid authentication token');
   }
 }
+
+export const authenticate = authenticateToken;

@@ -5,10 +5,8 @@ export default function StepPersonalDetails({
   setAge,
   weight,
   setWeight,
-  heightFt,
-  setHeightFt,
-  heightIn,
-  setHeightIn,
+  heightCm,
+  setHeightCm,
   onNext,
   onBack
 }) {
@@ -51,7 +49,7 @@ export default function StepPersonalDetails({
           </div>
         </div>
 
-        {/* Age & Weight Grid */}
+        {/* Age & Weight Grid (Weight in KGs) */}
         <div className="grid grid-cols-2 gap-4">
           {/* Age */}
           <div className="glass-panel p-4 rounded-xl border border-white/5 flex flex-col gap-1 focus-within:border-primary transition-colors">
@@ -67,14 +65,14 @@ export default function StepPersonalDetails({
                 max="120"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                placeholder="28"
-                className="bg-transparent border-none p-0 focus:ring-0 w-full font-data-lg text-2xl text-primary placeholder:text-primary/20 focus:outline-none"
+                placeholder="26"
+                className="bg-transparent border-none p-0 focus:ring-0 w-full font-data-lg text-2xl text-primary placeholder:text-primary/20 focus:outline-none font-[JetBrains_Mono,monospace]"
               />
               <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase">yrs</span>
             </div>
           </div>
 
-          {/* Weight */}
+          {/* Weight in KGs */}
           <div className="glass-panel p-4 rounded-xl border border-white/5 flex flex-col gap-1 focus-within:border-primary transition-colors">
             <label htmlFor="weight-input" className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1 uppercase tracking-wider cursor-pointer">
               <span className="material-symbols-outlined text-xs">scale</span>
@@ -85,52 +83,35 @@ export default function StepPersonalDetails({
                 id="weight-input"
                 type="number"
                 min="1"
-                max="999"
+                max="500"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                placeholder="185"
-                className="bg-transparent border-none p-0 focus:ring-0 w-full font-data-lg text-2xl text-primary placeholder:text-primary/20 focus:outline-none"
+                placeholder="74"
+                className="bg-transparent border-none p-0 focus:ring-0 w-full font-data-lg text-2xl text-primary placeholder:text-primary/20 focus:outline-none font-[JetBrains_Mono,monospace]"
               />
-              <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase">lbs</span>
+              <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase">kg</span>
             </div>
           </div>
         </div>
 
-        {/* Height (col-span-2) */}
-        <div className="glass-panel p-4 rounded-xl border border-white/5 flex flex-col gap-1">
-          <label htmlFor="height-ft-input" className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1 uppercase tracking-wider cursor-pointer">
+        {/* Height in CM */}
+        <div className="glass-panel p-4 rounded-xl border border-white/5 flex flex-col gap-1 focus-within:border-primary transition-colors">
+          <label htmlFor="height-cm-input" className="text-[10px] font-bold text-on-surface-variant flex items-center gap-1 uppercase tracking-wider cursor-pointer">
             <span className="material-symbols-outlined text-xs">straighten</span>
             Height
           </label>
-          <div className="flex gap-4 pt-1">
-            <div className="flex items-baseline gap-1 flex-1 border-b border-white/10 pb-1 focus-within:border-primary transition-colors">
-              <input 
-                id="height-ft-input"
-                aria-label="Height in feet"
-                type="number"
-                min="1"
-                max="8"
-                value={heightFt}
-                onChange={(e) => setHeightFt(e.target.value)}
-                placeholder="6"
-                className="bg-transparent border-none p-0 focus:ring-0 w-full font-data-lg text-2xl text-primary placeholder:text-primary/20 focus:outline-none"
-              />
-              <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase">ft</span>
-            </div>
-            <div className="flex items-baseline gap-1 flex-1 border-b border-white/10 pb-1 focus-within:border-primary transition-colors">
-              <input 
-                id="height-in-input"
-                aria-label="Height in inches"
-                type="number"
-                min="0"
-                max="11"
-                value={heightIn}
-                onChange={(e) => setHeightIn(e.target.value)}
-                placeholder="1"
-                className="bg-transparent border-none p-0 focus:ring-0 w-full font-data-lg text-2xl text-primary placeholder:text-primary/20 focus:outline-none"
-              />
-              <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase">in</span>
-            </div>
+          <div className="flex items-baseline gap-1 pt-1 border-b border-white/10 pb-1 focus-within:border-primary transition-colors">
+            <input 
+              id="height-cm-input"
+              type="number"
+              min="50"
+              max="300"
+              value={heightCm}
+              onChange={(e) => setHeightCm(e.target.value)}
+              placeholder="178"
+              className="bg-transparent border-none p-0 focus:ring-0 w-full font-data-lg text-2xl text-primary placeholder:text-primary/20 focus:outline-none font-[JetBrains_Mono,monospace]"
+            />
+            <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase">cm</span>
           </div>
         </div>
       </div>
@@ -145,7 +126,7 @@ export default function StepPersonalDetails({
         </button>
         <button 
           onClick={onNext}
-          disabled={!age || !weight || !heightFt}
+          disabled={!age || !weight || !heightCm}
           className="flex-[2] py-4 rounded-full bg-primary text-black font-extrabold text-xs tracking-widest uppercase shadow-lg shadow-primary/20 cursor-pointer active:scale-95 transition-all disabled:opacity-50"
         >
           Continue

@@ -20,12 +20,14 @@ export default function ProfileTab({
   const [editMode, setEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(
+    userProfile.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300'
+  );
   const [editFields, setEditFields] = useState({
     displayName: userProfile.displayName || '',
     fitnessLevel: userProfile.fitnessLevel || 'Beginner',
-    weight: userProfile.weight || '',
-    heightFt: userProfile.heightFt || '',
-    heightIn: userProfile.heightIn || ''
+    weight: userProfile.weight || 74,
+    heightCm: userProfile.heightCm || 178
   });
   const [comingSoon, setComingSoon] = useState(null);
 
@@ -33,50 +35,63 @@ export default function ProfileTab({
     setIsSaving(true);
     setSaveError(null);
     try {
-      const res = await profileApi.updateProfile({
+      await profileApi.updateProfile({
         displayName: editFields.displayName,
         fitnessLevel: editFields.fitnessLevel,
         weight: Number(editFields.weight),
-        heightFt: Number(editFields.heightFt),
-        heightIn: Number(editFields.heightIn)
+        heightCm: Number(editFields.heightCm)
       });
       if (setUserProfile) {
-        setUserProfile(prev => ({ ...prev, ...editFields, weight: Number(editFields.weight) }));
+        setUserProfile(prev => ({
+          ...prev,
+          ...editFields,
+          weight: Number(editFields.weight),
+          heightCm: Number(editFields.heightCm)
+        }));
       }
       setEditMode(false);
     } catch (e) {
-      setSaveError('Failed to save. Please try again.');
+      setSaveError(e?.message || 'Failed to save profile changes. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const bmi = userProfile.weight && userProfile.heightFt
-    ? (userProfile.weight / Math.pow((userProfile.heightFt * 30.48 + (userProfile.heightIn || 0) * 2.54) / 100, 2)).toFixed(1)
-    : '—';
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setAvatarUrl(url);
+    }
+  };
+
+  const weightVal = Number(userProfile.weight || profileWeight || editFields.weight || 74);
+  const heightCmVal = Number(userProfile.heightCm || editFields.heightCm || 178);
+  const heightMeters = heightCmVal / 100;
+  const bmi = (weightVal / (heightMeters * heightMeters)).toFixed(1);
 
   return (
-    <div className="flex flex-col w-full px-6 space-y-6 pt-6 pb-12 animate-in fade-in duration-300">
+    <div className="flex flex-col w-full max-w-[430px] mx-auto px-6 space-y-6 pt-6 pb-12 animate-in fade-in duration-300">
 
       {/* Coming Soon Sheet */}
       {comingSoon && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setComingSoon(null)}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative w-full max-w-[430px] bg-surface-container rounded-t-3xl p-8 space-y-4 animate-in slide-in-from-bottom duration-300" onClick={e => e.stopPropagation()}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="relative w-full max-w-[430px] bg-[#161616] rounded-t-3xl p-8 space-y-4 border-t border-white/10" onClick={e => e.stopPropagation()}>
             <div className="w-10 h-1 bg-white/20 rounded-full mx-auto" />
             <div className="flex flex-col items-center text-center space-y-3">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary text-2xl">{comingSoon.icon}</span>
+              <div className="w-14 h-14 rounded-full bg-[#f5c400]/10 flex items-center justify-center border border-[#f5c400]/20">
+                <span className="material-symbols-outlined text-[#f5c400] text-2xl">{comingSoon.icon}</span>
               </div>
-              <h3 className="text-lg font-bold text-on-surface">{comingSoon.title}</h3>
-              <p className="text-xs text-on-surface-variant max-w-[280px]">{comingSoon.description}</p>
-              <span className="px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded-full border border-primary/20">
+              <h3 className="text-lg font-bold text-white">{comingSoon.title}</h3>
+              <p className="text-xs text-[#B0AA9A] max-w-[280px] leading-relaxed">{comingSoon.description}</p>
+              <span className="px-4 py-1.5 bg-[#f5c400]/10 text-[#f5c400] text-[10px] font-bold uppercase tracking-widest rounded-full border border-[#f5c400]/20">
                 Coming Soon
               </span>
             </div>
             <button
               onClick={() => setComingSoon(null)}
-              className="w-full py-3 rounded-xl bg-surface-container-high text-on-surface-variant font-bold text-xs uppercase tracking-widest mt-4 cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-white/10 text-white font-bold text-xs uppercase tracking-widest mt-4 cursor-pointer hover:bg-white/20 transition-all"
             >
               Close
             </button>
@@ -84,148 +99,173 @@ export default function ProfileTab({
         </div>
       )}
 
-      {/* Profile Card Header */}
-      <div className="relative flex flex-col items-center">
-        <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-transparent rounded-full blur-sm opacity-30"></div>
-          <div className="w-32 h-32 rounded-full border-2 border-primary/20 p-1 relative z-10 overflow-hidden">
-            <div className="w-full h-full rounded-full bg-surface-container-high flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
-            </div>
-            <div className="absolute bottom-1 right-1 bg-primary text-black rounded-full p-1 shadow-lg flex items-center justify-center border-2 border-black">
-              <span className="material-symbols-outlined text-[14px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-            </div>
+      {/* Profile Header Card */}
+      <div className="relative flex flex-col items-center text-center">
+        {/* Avatar Container */}
+        <div className="relative w-32 h-32 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#f5c400] to-transparent rounded-full blur-md opacity-30"></div>
+          <div className="w-32 h-32 rounded-full border-2 border-[#f5c400]/30 p-1 relative z-10 overflow-hidden bg-[#161616] shadow-xl">
+            <img
+              src={avatarUrl}
+              alt={userProfile.displayName || 'Athlete'}
+              className="w-full h-full rounded-full object-cover"
+            />
           </div>
+          
+          {/* Edit Avatar Badge */}
+          <label className="absolute bottom-1 right-1 z-20 w-9 h-9 rounded-full bg-[#f5c400] text-black shadow-lg flex items-center justify-center border-2 border-black cursor-pointer hover:scale-110 active:scale-95 transition-all">
+            <span className="material-symbols-outlined text-sm font-black" style={{ fontVariationSettings: "'FILL' 1" }}>photo_camera</span>
+            <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+          </label>
         </div>
-        <div className="mt-4 text-center">
-          <h2 className="text-display-lg-mobile font-bold text-on-surface">{userProfile.displayName || 'Athlete'}</h2>
-          <p className="text-xs text-on-surface-variant font-semibold">{userProfile.username || '@athlete'}</p>
+
+        {/* Centered User Info */}
+        <div className="mt-4 text-center space-y-1">
+          <h2 className="text-2xl font-extrabold text-white tracking-tight leading-tight">{userProfile.displayName || 'Rahul Sharma'}</h2>
+          <p className="text-xs text-[#B0AA9A] font-semibold tracking-wide">{userProfile.username || '@rahul_fit'}</p>
         </div>
-        <div className="flex items-center mt-4">
-          <div className="px-4 py-1 bg-surface-container rounded-full border border-primary/20">
-            <span className="text-[10px] font-bold text-primary uppercase tracking-wider">{userProfile.fitnessLevel || 'Beginner'}</span>
+
+        {/* Centered Membership Badge */}
+        <div className="flex items-center justify-center mt-3">
+          <div className="px-4 py-1 bg-[#161616] rounded-full border border-[#f5c400]/30 flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-xs text-[#f5c400]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+            <span className="text-[10px] font-bold text-[#f5c400] uppercase tracking-widest">{userProfile.fitnessLevel || 'Elite Hypertrophy'}</span>
           </div>
         </div>
 
+        {/* Edit Profile Toggle Button & Form */}
         {!editMode ? (
           <button
             onClick={() => setEditMode(true)}
-            className="mt-6 px-6 py-2.5 bg-surface-container-high text-on-surface rounded-lg text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-surface-bright transition-colors border border-white/5 cursor-pointer active:scale-95"
+            className="mt-5 px-6 py-3 bg-[#161616] text-white rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-white/10 transition-all border border-white/10 cursor-pointer active:scale-95 shadow-md"
           >
             <span className="material-symbols-outlined text-sm">edit</span>
-            Edit Profile
+            Edit Profile Biometrics
           </button>
         ) : (
-          <div className="mt-6 w-full space-y-3">
-            <input
-              type="text"
-              placeholder="Display Name"
-              value={editFields.displayName}
-              onChange={e => setEditFields(f => ({ ...f, displayName: e.target.value }))}
-              className="w-full bg-surface-container-low rounded-xl px-4 py-3 text-sm text-on-surface border border-white/10 focus:border-primary focus:outline-none transition-all"
-            />
-            <select
-              value={editFields.fitnessLevel}
-              onChange={e => setEditFields(f => ({ ...f, fitnessLevel: e.target.value }))}
-              className="w-full bg-surface-container-low rounded-xl px-4 py-3 text-sm text-on-surface border border-white/10 focus:border-primary focus:outline-none transition-all"
-            >
-              {['Beginner', 'Intermediate', 'Advanced', 'Elite'].map(l => (
-                <option key={l} value={l} className="bg-surface-container">{l}</option>
-              ))}
-            </select>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="mt-5 w-full bg-[#161616] border border-white/10 p-5 rounded-2xl space-y-3.5 text-left animate-in fade-in duration-200">
+            <h3 className="text-xs font-bold text-[#f5c400] uppercase tracking-widest">Update Profile Details</h3>
+            
+            <div>
+              <label className="text-[10px] font-bold text-[#B0AA9A] uppercase tracking-wider block mb-1">Display Name</label>
               <input
-                type="number"
-                placeholder="Weight (kg)"
-                value={editFields.weight}
-                onChange={e => setEditFields(f => ({ ...f, weight: e.target.value }))}
-                className="col-span-1 bg-surface-container-low rounded-xl px-3 py-3 text-sm text-on-surface border border-white/10 focus:border-primary focus:outline-none transition-all"
-              />
-              <input
-                type="number"
-                placeholder="Ht ft"
-                value={editFields.heightFt}
-                onChange={e => setEditFields(f => ({ ...f, heightFt: e.target.value }))}
-                className="col-span-1 bg-surface-container-low rounded-xl px-3 py-3 text-sm text-on-surface border border-white/10 focus:border-primary focus:outline-none transition-all"
-              />
-              <input
-                type="number"
-                placeholder="Ht in"
-                value={editFields.heightIn}
-                onChange={e => setEditFields(f => ({ ...f, heightIn: e.target.value }))}
-                className="col-span-1 bg-surface-container-low rounded-xl px-3 py-3 text-sm text-on-surface border border-white/10 focus:border-primary focus:outline-none transition-all"
+                type="text"
+                placeholder="Display Name"
+                value={editFields.displayName}
+                onChange={e => setEditFields(f => ({ ...f, displayName: e.target.value }))}
+                className="w-full h-12 bg-[#101010] rounded-xl px-4 text-xs text-white border border-white/10 focus:border-[#f5c400] focus:outline-none transition-all"
               />
             </div>
-            {saveError && <p className="text-xs text-error text-center">{saveError}</p>}
-            <div className="flex gap-3">
+
+            <div>
+              <label className="text-[10px] font-bold text-[#B0AA9A] uppercase tracking-wider block mb-1">Fitness Level</label>
+              <select
+                value={editFields.fitnessLevel}
+                onChange={e => setEditFields(f => ({ ...f, fitnessLevel: e.target.value }))}
+                className="w-full h-12 bg-[#101010] rounded-xl px-4 text-xs text-white border border-white/10 focus:border-[#f5c400] focus:outline-none transition-all cursor-pointer"
+              >
+                {['Beginner', 'Intermediate', 'Advanced', 'Elite'].map(l => (
+                  <option key={l} value={l} className="bg-[#161616] text-white">{l}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[9px] font-bold text-[#B0AA9A] uppercase tracking-wider block mb-1">Weight (kg)</label>
+                <input
+                  type="number"
+                  placeholder="Weight (kg)"
+                  value={editFields.weight}
+                  onChange={e => setEditFields(f => ({ ...f, weight: e.target.value }))}
+                  className="w-full h-12 bg-[#101010] rounded-xl px-3 text-xs text-white border border-white/10 focus:border-[#f5c400] focus:outline-none transition-all font-[JetBrains_Mono,monospace]"
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-bold text-[#B0AA9A] uppercase tracking-wider block mb-1">Height (cm)</label>
+                <input
+                  type="number"
+                  placeholder="Height (cm)"
+                  value={editFields.heightCm}
+                  onChange={e => setEditFields(f => ({ ...f, heightCm: e.target.value }))}
+                  className="w-full h-12 bg-[#101010] rounded-xl px-3 text-xs text-white border border-white/10 focus:border-[#f5c400] focus:outline-none transition-all font-[JetBrains_Mono,monospace]"
+                />
+              </div>
+            </div>
+
+            {saveError && <p className="text-xs text-red-400 text-center font-medium">{saveError}</p>}
+
+            <div className="flex gap-3 pt-2">
               <button
                 onClick={() => { setEditMode(false); setSaveError(null); }}
-                className="flex-1 py-3 rounded-xl bg-surface-container border border-white/10 text-on-surface-variant font-bold text-xs uppercase tracking-widest cursor-pointer"
+                className="flex-1 h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[#B0AA9A] font-bold text-xs uppercase tracking-widest transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleEditSave}
                 disabled={isSaving}
-                className="flex-1 py-3 rounded-xl bg-primary text-black font-bold text-xs uppercase tracking-widest disabled:opacity-50 cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+                className="flex-1 h-12 rounded-xl bg-[#f5c400] text-black font-bold text-xs uppercase tracking-widest disabled:opacity-50 transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-[#f5c400]/10"
               >
                 {isSaving ? <span className="material-symbols-outlined text-sm animate-spin">autorenew</span> : null}
-                {isSaving ? 'Saving...' : 'Save'}
+                {isSaving ? 'Saving...' : 'Save Profile'}
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Quick Stats Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center border border-white/5">
-          <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Height</span>
-          <span className="font-data-lg text-lg text-primary">
-            {userProfile.heightFt ? `${userProfile.heightFt}'${userProfile.heightIn || 0}"` : '—'}
+      {/* Quick Statistics Cards - Weight in KGs and Height in CM */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-[#161616] rounded-xl p-4 flex flex-col items-center justify-center border border-white/5 h-24">
+          <span className="text-[9px] font-bold text-[#B0AA9A] uppercase tracking-widest mb-1">Height</span>
+          <span className="font-[JetBrains_Mono,monospace] text-xl font-bold text-[#f5c400]">
+            {heightCmVal} <span className="text-xs text-[#B0AA9A] font-medium">cm</span>
           </span>
         </div>
-        <div className="bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center border border-white/5">
-          <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Weight</span>
-          <span className="font-data-lg text-lg text-primary">{profileWeight || '—'}<span className="text-xs ml-0.5 text-on-surface-variant font-semibold">{profileWeight ? 'kg' : ''}</span></span>
+        <div className="bg-[#161616] rounded-xl p-4 flex flex-col items-center justify-center border border-white/5 h-24">
+          <span className="text-[9px] font-bold text-[#B0AA9A] uppercase tracking-widest mb-1">Weight</span>
+          <span className="font-[JetBrains_Mono,monospace] text-xl font-bold text-[#f5c400]">
+            {weightVal} <span className="text-xs text-[#B0AA9A] font-medium">kg</span>
+          </span>
         </div>
-        <div className="bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center border border-white/5">
-          <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Age</span>
-          <span className="font-data-lg text-lg text-white">{userProfile.age || '—'}</span>
+        <div className="bg-[#161616] rounded-xl p-4 flex flex-col items-center justify-center border border-white/5 h-24">
+          <span className="text-[9px] font-bold text-[#B0AA9A] uppercase tracking-widest mb-1">Age</span>
+          <span className="font-[JetBrains_Mono,monospace] text-xl font-bold text-white">{userProfile.age || 26}</span>
         </div>
-        <div className="bg-surface-container rounded-xl p-4 flex flex-col items-center justify-center border border-white/5">
-          <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">BMI</span>
-          <span className="font-data-lg text-lg text-white">{bmi}</span>
+        <div className="bg-[#161616] rounded-xl p-4 flex flex-col items-center justify-center border border-white/5 h-24">
+          <span className="text-[9px] font-bold text-[#B0AA9A] uppercase tracking-widest mb-1">BMI</span>
+          <span className="font-[JetBrains_Mono,monospace] text-xl font-bold text-white">{bmi}</span>
         </div>
 
         {/* Fitness Score Card */}
-        <div className="col-span-2 bg-surface-container rounded-xl p-5 flex items-center justify-between border border-primary/20 relative overflow-hidden">
+        <div className="col-span-2 bg-[#161616] rounded-xl p-5 flex items-center justify-between border border-[#f5c400]/20 relative overflow-hidden">
           <div className="relative z-10">
-            <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest">Fitness Score</span>
+            <span className="text-[9px] font-bold text-[#B0AA9A] uppercase tracking-widest">FITAI Fitness Score</span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="font-data-lg text-2xl text-primary">{profileFitnessScore}</span>
-              <span className="font-data-sm text-xs text-on-surface-variant">/ 100</span>
+              <span className="font-[JetBrains_Mono,monospace] text-3xl font-extrabold text-[#f5c400]">{profileFitnessScore || 88}</span>
+              <span className="font-[JetBrains_Mono,monospace] text-xs text-[#B0AA9A]">/ 100</span>
             </div>
           </div>
           <div className="w-14 h-14 relative z-10">
             <svg className="w-full h-full transform -rotate-90">
-              <circle className="text-surface-bright" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" strokeWidth="4"></circle>
+              <circle className="text-white/10" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" strokeWidth="4"></circle>
               <circle
-                className="text-primary transition-all duration-1000"
+                className="text-[#f5c400] transition-all duration-1000"
                 cx="28" cy="28" fill="transparent" r="24"
                 stroke="currentColor" strokeDasharray="150.8"
-                style={{ strokeDashoffset: fitnessOffset }}
+                style={{ strokeDashoffset: fitnessOffset || 30 }}
                 strokeLinecap="round" strokeWidth="4"
               ></circle>
             </svg>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#f5c400]/5 to-transparent"></div>
         </div>
       </div>
 
       {/* Active Goals */}
       <section className="space-y-3">
-        <h3 className="text-label-caps text-on-surface-variant uppercase tracking-widest font-bold px-1">Active Goals</h3>
+        <h3 className="text-xs text-[#B0AA9A] uppercase tracking-widest font-bold px-1">Active Objectives</h3>
         <div className="flex flex-wrap gap-2">
           {PROFILE_GOALS_OPTIONS.map((goal) => {
             const isActive = selectedGoals.includes(goal);
@@ -235,8 +275,8 @@ export default function ProfileTab({
                 onClick={() => handleToggleGoal(goal)}
                 className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all border cursor-pointer active:scale-95 ${
                   isActive
-                    ? 'bg-primary text-black border-primary'
-                    : 'bg-surface-container text-on-surface-variant border-white/5 hover:text-white'
+                    ? 'bg-[#f5c400] text-black border-[#f5c400] shadow-[0_0_12px_rgba(245,196,0,0.3)]'
+                    : 'bg-[#161616] text-[#B0AA9A] border-white/5 hover:text-white'
                 }`}
               >
                 {goal}
@@ -248,7 +288,7 @@ export default function ProfileTab({
 
       {/* AI Preferences */}
       <section className="space-y-3">
-        <h3 className="text-label-caps text-on-surface-variant uppercase tracking-widest font-bold px-1">AI Preferences</h3>
+        <h3 className="text-xs text-[#B0AA9A] uppercase tracking-widest font-bold px-1">AI Engine Controls</h3>
         <div className="space-y-3">
           {AI_PREFERENCES_CONFIG.map((pref) => {
             const isChecked = Boolean(aiPreferences[pref.key]);
@@ -256,18 +296,18 @@ export default function ProfileTab({
               <div
                 key={pref.key}
                 onClick={() => handleToggleAiPreference(pref.key)}
-                className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-white/5 cursor-pointer active:bg-white/5 transition-colors"
+                className="flex items-center justify-between p-4 bg-[#161616] rounded-xl border border-white/5 cursor-pointer active:bg-white/5 transition-colors"
               >
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-on-surface">{pref.label}</span>
-                  <span className="text-[10px] text-on-surface-variant font-medium">{pref.desc}</span>
+                  <span className="text-sm font-semibold text-white">{pref.label}</span>
+                  <span className="text-[10px] text-[#B0AA9A] font-medium">{pref.desc}</span>
                 </div>
                 <button
                   type="button" role="switch" aria-checked={isChecked} aria-label={pref.label}
                   onClick={(e) => { e.stopPropagation(); handleToggleAiPreference(pref.key); }}
-                  className={`w-12 h-6 rounded-full relative flex items-center px-1 transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${isChecked ? 'bg-primary' : 'bg-surface-bright'}`}
+                  className={`w-12 h-6 rounded-full relative flex items-center px-1 transition-colors duration-200 cursor-pointer ${isChecked ? 'bg-[#f5c400]' : 'bg-[#1a1a1a]'}`}
                 >
-                  <div className={`w-4 h-4 rounded-full shadow transition-transform duration-200 ${isChecked ? 'translate-x-6 bg-black' : 'translate-x-0 bg-on-surface-variant'}`}></div>
+                  <div className={`w-4 h-4 rounded-full shadow transition-transform duration-200 ${isChecked ? 'translate-x-6 bg-black' : 'translate-x-0 bg-[#B0AA9A]'}`}></div>
                 </button>
               </div>
             );
@@ -277,8 +317,8 @@ export default function ProfileTab({
 
       {/* App Theme */}
       <section className="space-y-3">
-        <h3 className="text-label-caps text-on-surface-variant uppercase tracking-widest font-bold px-1">App Theme</h3>
-        <div className="grid grid-cols-3 gap-4">
+        <h3 className="text-xs text-[#B0AA9A] uppercase tracking-widest font-bold px-1">App Theme</h3>
+        <div className="grid grid-cols-3 gap-3">
           {['Dark', 'Light', 'System'].map((theme) => {
             const isSelected = selectedTheme === theme;
             let icon = 'dark_mode';
@@ -286,10 +326,10 @@ export default function ProfileTab({
             if (theme === 'System') icon = 'settings_brightness';
             return (
               <div key={theme} onClick={() => setSelectedTheme(theme)} className="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
-                <div className={`w-full aspect-square bg-surface-container rounded-lg flex items-center justify-center border transition-all ${isSelected ? 'border-primary shadow-[0_0_12px_rgba(245,196,0,0.2)] text-primary' : 'border-white/5 text-on-surface-variant hover:text-white'}`}>
-                  <span className="material-symbols-outlined">{icon}</span>
+                <div className={`w-full aspect-square bg-[#161616] rounded-xl flex items-center justify-center border transition-all ${isSelected ? 'border-[#f5c400] shadow-[0_0_12px_rgba(245,196,0,0.2)] text-[#f5c400]' : 'border-white/5 text-[#B0AA9A] hover:text-white'}`}>
+                  <span className="material-symbols-outlined text-2xl">{icon}</span>
                 </div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-on-surface-variant'}`}>{theme}</span>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? 'text-[#f5c400]' : 'text-[#B0AA9A]'}`}>{theme}</span>
               </div>
             );
           })}
@@ -298,7 +338,7 @@ export default function ProfileTab({
 
       {/* Account & Security */}
       <section className="space-y-3">
-        <h3 className="text-label-caps text-on-surface-variant uppercase tracking-widest font-bold px-1">Account & Security</h3>
+        <h3 className="text-xs text-[#B0AA9A] uppercase tracking-widest font-bold px-1">Account & Security</h3>
         <div className="space-y-2">
           {[
             { icon: 'lock', label: 'Change Password', key: 'password', desc: 'Update account password via email verification' },
@@ -308,13 +348,13 @@ export default function ProfileTab({
             <button
               key={item.key}
               onClick={() => setComingSoon({ title: item.label, icon: item.icon, description: item.desc })}
-              className="w-full flex items-center justify-between p-4 bg-surface-container rounded-xl border border-white/5 hover:border-primary/20 transition-all cursor-pointer active:scale-[0.99]"
+              className="w-full flex items-center justify-between p-4 bg-[#161616] rounded-xl border border-white/5 hover:border-[#f5c400]/20 transition-all cursor-pointer active:scale-[0.99]"
             >
               <div className="flex items-center gap-4">
-                <span className="material-symbols-outlined text-primary text-xl">{item.icon}</span>
-                <span className="text-sm font-semibold text-on-surface">{item.label}</span>
+                <span className="material-symbols-outlined text-[#f5c400] text-xl">{item.icon}</span>
+                <span className="text-sm font-semibold text-white">{item.label}</span>
               </div>
-              <span className="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
+              <span className="material-symbols-outlined text-[#B0AA9A] text-sm">chevron_right</span>
             </button>
           ))}
         </div>
@@ -325,7 +365,7 @@ export default function ProfileTab({
         <button
           onClick={handleSecureLogout}
           disabled={logoutState !== 'idle'}
-          className={`w-full py-4 font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-2 active:scale-95 transition-all rounded-lg shadow-lg ${
+          className={`w-full h-14 font-bold text-xs tracking-widest uppercase flex items-center justify-center gap-2 active:scale-95 transition-all rounded-xl shadow-lg cursor-pointer ${
             logoutState === 'idle' ? 'bg-[#93000a] text-white shadow-red-950/20' :
             logoutState === 'securing' ? 'bg-[#93000a]/80 text-white cursor-wait' :
             'bg-green-600 text-white'
@@ -335,7 +375,7 @@ export default function ProfileTab({
           {logoutState === 'securing' && (<><span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>Securing session...</>)}
           {logoutState === 'closed' && (<><span className="material-symbols-outlined text-lg">check_circle</span>Session Closed</>)}
         </button>
-        <p className="text-center text-[9px] font-bold text-on-surface-variant uppercase mt-4 tracking-wider">
+        <p className="text-center text-[9px] font-bold text-[#B0AA9A] uppercase mt-4 tracking-wider">
           Version 2.4.0-pro • FitAI X Elite
         </p>
       </div>

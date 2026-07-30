@@ -1,140 +1,80 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react';
 import { motion } from 'framer-motion';
 import BottomNav from './BottomNav';
 
 export default function SessionComplete() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const session = location.state?.session || {
+    title: 'Hypertrophy Push Session',
+    durationSeconds: 2740,
+    totalVolumeKg: 3200,
+    caloriesBurned: 482,
+    rpeAvg: 8.5,
+    aiFeedback: 'Great job! Progressive overload targets successfully achieved with optimal CNS readiness.',
+    rating: 5,
+  };
 
-  useEffect(() => {
-    // Simple festive confetti canvas effect
-    const canvas = document.getElementById('confetti-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const particles = Array.from({ length: 50 }).map(() => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height * 0.5,
-      r: Math.random() * 4 + 2,
-      color: '#f5c400',
-      vy: Math.random() * 2 + 1,
-    }));
-    let animId;
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.y += p.vy;
-        if (p.y > canvas.height) p.y = -10;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      animId = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => cancelAnimationFrame(animId);
-  }, []);
+  const minutes = Math.round(session.durationSeconds / 60) || 45;
 
   return (
-    <div className="w-full flex-1 flex flex-col bg-[#131313] min-h-screen pb-32 text-[#e5e2e1] font-[Manrope,sans-serif] relative overflow-hidden">
-      <canvas id="confetti-canvas" className="fixed inset-0 pointer-events-none z-10 opacity-70" />
-
+    <div className="w-full flex-1 flex flex-col bg-[#131313] min-h-screen pb-32 text-[#e5e2e1]">
       <header className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 bg-[#131313]/80 backdrop-blur-xl border-b border-white/5 h-16 shadow-2xl">
         <div className="flex items-center justify-between px-6 h-full">
-          <div className="flex items-center gap-3">
-            <h1 className="text-[22px] font-extrabold text-[#f5c400] tracking-tight">FITAIX</h1>
-          </div>
-          <button className="text-[#f5c400] hover:opacity-80 transition-opacity">
-            <span className="material-symbols-outlined">settings_heart</span>
+          <h1 className="text-xl font-bold text-[#f5c400] tracking-tight font-[Manrope]">Session Summary</h1>
+          <button onClick={() => navigate('/dashboard')} className="text-[#d1c5ab]/60 hover:text-white transition-colors">
+            <span className="material-symbols-outlined">close</span>
           </button>
         </div>
       </header>
 
-      <main className="pt-20 px-6 space-y-6 max-w-lg mx-auto w-full relative z-20">
-        {/* Hero Banner */}
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.45 }}
-          className="text-center py-6 space-y-2">
-          <div className="w-20 h-20 rounded-full bg-[#f5c400]/10 border border-[#f5c400]/30 flex items-center justify-center mx-auto mb-3 shadow-[0_0_30px_rgba(245,196,0,0.3)]">
-            <span className="material-symbols-outlined text-[#f5c400] text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+      <main className="pt-20 px-6 space-y-6 max-w-[430px] mx-auto w-full text-center">
+        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5 }}>
+          <div className="w-20 h-20 rounded-full bg-[#f5c400]/10 border border-[#f5c400]/30 mx-auto flex items-center justify-center mb-3">
+            <span className="material-symbols-outlined text-[#f5c400] text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+              emoji_events
+            </span>
           </div>
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#f5c400]">WORKOUT FINISHED</span>
-          <h2 className="text-3xl font-extrabold text-[#e5e2e1]">Session Complete!</h2>
-          <p className="text-xs text-[#d1c5ab]">All sets logged & biomechanical feedback processed.</p>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#f5c400]">Workout Complete!</span>
+          <h2 className="text-2xl font-bold text-[#e5e2e1] mt-1">{session.title}</h2>
         </motion.div>
 
-        {/* Stats Bento */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'DURATION', val: '62', unit: 'min' },
-            { label: 'CALORIES', val: '512', unit: 'kcal' },
-            { label: 'VOLUME', val: '14.2', unit: 'tons' },
-          ].map(s => (
-            <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="rounded-xl p-3 text-center" style={{ background: 'rgba(32,31,31,0.5)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#d1c5ab]/60 block mb-1">{s.label}</span>
-              <span className="text-2xl font-bold text-[#f5c400] font-[JetBrains_Mono,monospace]">{s.val}</span>
-              <span className="text-xs text-[#d1c5ab] font-[JetBrains_Mono,monospace] ml-0.5">{s.unit}</span>
-            </motion.div>
-          ))}
+        {/* Key Metrics Bento */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="p-3 rounded-xl bg-[#201f1f] border border-white/5">
+            <span className="text-[9px] text-[#d1c5ab] font-bold uppercase block mb-1">Time</span>
+            <p className="text-lg font-bold text-[#f5c400] font-[JetBrains_Mono,monospace]">{minutes}m</p>
+          </div>
+          <div className="p-3 rounded-xl bg-[#201f1f] border border-white/5">
+            <span className="text-[9px] text-[#d1c5ab] font-bold uppercase block mb-1">Volume</span>
+            <p className="text-lg font-bold text-[#f5c400] font-[JetBrains_Mono,monospace]">{session.totalVolumeKg}kg</p>
+          </div>
+          <div className="p-3 rounded-xl bg-[#201f1f] border border-white/5">
+            <span className="text-[9px] text-[#d1c5ab] font-bold uppercase block mb-1">Calories</span>
+            <p className="text-lg font-bold text-[#f5c400] font-[JetBrains_Mono,monospace]">{session.caloriesBurned} kcal</p>
+          </div>
         </div>
 
-        {/* AI Performance Insight */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="rounded-xl p-5 border border-[#f5c400]/20 relative overflow-hidden"
-          style={{ background: 'radial-gradient(at 0% 0%, rgba(245,196,0,0.1) 0px, transparent 50%), rgba(26,26,26,1)' }}>
-          <div className="flex items-start gap-4">
-            <div className="bg-[#f5c400] p-3 rounded-xl text-black shrink-0 shadow-[0_0_20px_rgba(245,196,0,0.4)]">
-              <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-[#f5c400] uppercase tracking-widest block mb-1">AI Performance Insight</span>
-              <p className="text-base font-bold text-white italic leading-tight">
-                "Elite performance today. Your power output peaked at minute 42 during the final heavy set."
-              </p>
-            </div>
+        {/* AI Feedback */}
+        <section className="p-5 rounded-xl border border-[#f5c400]/20 bg-[#f5c400]/5 text-left space-y-2">
+          <div className="flex items-center gap-2 text-[#f5c400]">
+            <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+              auto_awesome
+            </span>
+            <h3 className="text-xs font-bold uppercase tracking-wider">FITAI Coach Post-Session Report</h3>
           </div>
-        </motion.div>
+          <p className="text-xs text-[#d1c5ab] leading-relaxed italic">"{session.aiFeedback}"</p>
+        </section>
 
-        {/* Recovery Protocol */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          className="rounded-xl p-5 space-y-4" style={{ background: 'rgba(32,31,31,0.5)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <h3 className="text-lg font-black text-[#f5c400] tracking-tight">RECOVERY PROTOCOL</h3>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#f5c400]/10 border border-[#f5c400]/30 flex items-center justify-center shrink-0 text-[#f5c400]">
-                <span className="material-symbols-outlined text-lg">medication</span>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-[#e5e2e1]">Magnesium Supplement</p>
-                <p className="text-xs text-[#d1c5ab]">Take 400mg within 60 mins to support muscle relaxation and prevent cramping.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#f5c400]/10 border border-[#f5c400]/30 flex items-center justify-center shrink-0 text-[#f5c400]">
-                <span className="material-symbols-outlined text-lg">bedtime</span>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-[#e5e2e1]">Optimized Sleep</p>
-                <p className="text-xs text-[#d1c5ab]">Target 8.5 hours tonight. Your CNS requires extended REM for this load.</p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-3">
-          <button onClick={() => navigate('/workout/perf-lab')} className="w-full bg-[#f5c400] text-black py-4 rounded-xl font-black text-sm uppercase tracking-wider shadow-[0_10px_20px_rgba(245,196,0,0.2)] hover:brightness-110 active:scale-95 transition-all">
-            View Performance Lab
-          </button>
-          <button onClick={() => navigate('/dashboard')} className="w-full bg-[#1c1b1b] text-[#e5e2e1] border border-[#f5c400]/20 py-4 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-white/5 active:scale-95 transition-all">
-            Back to Dashboard
-          </button>
-        </div>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="w-full h-14 bg-[#f5c400] text-black font-bold text-sm uppercase tracking-wider rounded-xl shadow-[0_0_25px_rgba(245,196,0,0.3)] hover:brightness-105 transition-all cursor-pointer"
+        >
+          Save & Return to Dashboard
+        </button>
       </main>
 
-      <BottomNav activeId="records" />
+      <BottomNav activeId="home" />
     </div>
   );
 }
