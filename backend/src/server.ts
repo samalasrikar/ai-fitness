@@ -20,8 +20,12 @@ async function bootstrap(): Promise<void> {
     // 3. Initialize Socket.IO (configuration only)
     initializeSocket(httpServer);
 
-    // 4. Check PostgreSQL connection
-    await checkDatabaseConnection();
+    // 4. Check PostgreSQL connection (non-fatal if temporarily unreachable)
+    try {
+      await checkDatabaseConnection();
+    } catch (dbErr) {
+      logger.warn('⚠️ Database connection warning: Server started without active DB connection.', dbErr);
+    }
 
     // 5. Start listening
     httpServer.listen(env.PORT, () => {

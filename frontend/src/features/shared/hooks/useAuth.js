@@ -80,7 +80,7 @@ export function useAuth() {
           username: `@${userData.firstName.toLowerCase()}_fit`
         }));
       }
-      navigate('/onboarding');
+      navigate('/setup');
       return response.data;
     } catch (err) {
       setError(err.message || 'Signup failed');
