@@ -5,8 +5,7 @@ import { Navigate, Outlet } from 'react-router-dom';
  * Authentication logic will be wired in Phase 2
  */
 export function ProtectedRoute({ redirectTo = '/login' }) {
-  // Placeholder condition: always allow in Phase 1 setup
-  const isAuthenticated = true;
+  const isAuthenticated = localStorage.getItem('isLoggedIn') === 'true';
 
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
