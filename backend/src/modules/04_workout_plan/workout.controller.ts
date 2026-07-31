@@ -26,6 +26,17 @@ export class WorkoutController {
     }
   };
 
+  public getDaily = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.userId;
+      const day = req.query.day ? String(req.query.day) : undefined;
+      const workout = await this.service.getDailyWorkout(userId, day);
+      res.status(200).json(ApiResponse.success('Daily workout retrieved', workout));
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public generate = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.userId;
@@ -36,11 +47,56 @@ export class WorkoutController {
     }
   };
 
+  public generateAI = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.userId;
+      const plan = await this.service.generateAIWorkout(userId, req.body);
+      res.status(201).json(ApiResponse.created('AI Workout generated successfully', plan));
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public createManual = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.userId;
       const plan = await this.service.createManualPlan(userId, req.body);
       res.status(201).json(ApiResponse.created('Manual workout plan created', plan));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public replaceExercise = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const alternatives = await this.service.getAlternatives({
+        currentExerciseName: String(req.query.currentExerciseName || req.body?.currentExerciseName || ''),
+        targetMuscle: req.query.targetMuscle ? String(req.query.targetMuscle) : req.body?.targetMuscle,
+        equipment: req.query.equipment ? String(req.query.equipment) : req.body?.equipment,
+        difficulty: req.query.difficulty ? String(req.query.difficulty) : req.body?.difficulty,
+        searchQuery: req.query.searchQuery ? String(req.query.searchQuery) : req.body?.searchQuery,
+      });
+      res.status(200).json(ApiResponse.success('Exercise alternatives retrieved', alternatives));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAnalytics = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.userId;
+      const analytics = await this.service.getWeeklyAnalytics(userId);
+      res.status(200).json(ApiResponse.success('Weekly analytics retrieved', analytics));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getRecommendations = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.userId;
+      const recommendations = await this.service.getRecommendations(userId);
+      res.status(200).json(ApiResponse.success('AI recommendations retrieved', recommendations));
     } catch (error) {
       next(error);
     }

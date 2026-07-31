@@ -60,9 +60,19 @@ router.get('/', authenticate, async (req: AuthenticatedRequest, res: Response, n
       { calories: 0, protein: 0, carbs: 0, fat: 0 }
     );
 
+    const activeRow = activeWorkoutRes.rows[0];
+    const activeWorkout = activeRow
+      ? {
+          id: activeRow.id,
+          title: activeRow.title,
+          duration: activeRow.duration,
+          exercises: typeof activeRow.exercises === 'string' ? JSON.parse(activeRow.exercises) : activeRow.exercises,
+        }
+      : null;
+
     const payload = {
       profile,
-      activeWorkout: activeWorkoutRes.rows[0] || null,
+      activeWorkout,
       workoutHistory: workoutHistoryRes.rows || [],
       nutrition: {
         totals: nutritionTotals,

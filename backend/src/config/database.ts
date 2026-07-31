@@ -164,6 +164,24 @@ export async function checkDatabaseConnection(): Promise<void> {
         amount_ml INT NOT NULL,
         logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+      CREATE TABLE IF NOT EXISTS workout_recommendations (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(200) NOT NULL,
+        type VARCHAR(50) NOT NULL,
+        reason TEXT NOT NULL,
+        recommended_action TEXT NOT NULL,
+        priority VARCHAR(20) NOT NULL DEFAULT 'Medium',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS user_streaks (
+        user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        active_days_count INT DEFAULT 14,
+        has_joined_challenge BOOLEAN DEFAULT false,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     // Clean up old sample seed meals from database table
