@@ -274,17 +274,10 @@ export default function CreateWithAI() {
         isOpen={isManualOpen}
         onClose={() => setIsManualOpen(false)}
         onSave={async (manualData) => {
-          try {
-            const res = await workoutApi.createManualPlan(manualData);
-            const newPlan = res.data?.data ? res.data.data : res.data;
-            navigate('/workout/ai-workout', { state: { workout: newPlan } });
-          } catch (err) {
-            alert(
-              err.response?.data?.message
-                ? err.response.data.message
-                : err.message
-            );
-          }
+          // Let errors bubble up – the modal's hook catches them and shows an inline banner
+          const res = await workoutApi.createManualPlan(manualData);
+          const newPlan = res.data?.data ? res.data.data : res.data;
+          navigate('/workout/ai-workout', { state: { workout: newPlan } });
         }}
       />
 

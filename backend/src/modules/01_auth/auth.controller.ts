@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthenticatedRequest, RegisterDTO, LoginDTO } from './auth.types';
 import { ApiResponse } from '../../utils/ApiResponse';
 import { env } from '../../env';
+import { logAuthEvent } from '../../utils/authLogger';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Auth Controller – HTTP Layer
@@ -25,6 +26,7 @@ export class AuthController {
       const result = await this.authService.register(dto);
 
       this.setRefreshTokenCookie(res, result.tokens.refreshToken);
+      logAuthEvent(req, 'auth.signup', result.user.id);
 
       res.status(201).json(
         ApiResponse.created('Account created successfully', {
@@ -46,6 +48,7 @@ export class AuthController {
       const result = await this.authService.login(dto);
 
       this.setRefreshTokenCookie(res, result.tokens.refreshToken);
+      logAuthEvent(req, 'auth.login', result.user.id);
 
       res.status(200).json(
         ApiResponse.success('Logged in successfully', {
@@ -67,13 +70,19 @@ export class AuthController {
       const tokens = await this.authService.refreshToken(refreshToken);
 
       this.setRefreshTokenCookie(res, tokens.refreshToken);
+      logAuthEvent(req, 'auth.refresh');
 
       res.status(200).json(
         ApiResponse.success('Token refreshed successfully', {
           accessToken: tokens.accessToken,
         }),
       );
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.message?.includes('reuse')) {
+        logAuthEvent(req, 'auth.tokenReuseDetected');
+      } else {
+        logAuthEvent(req, 'auth.refreshFailed');
+      }
       next(error);
     }
   };
@@ -83,8 +92,9 @@ export class AuthController {
    */
   public logout = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      if (req.user?.userId) {
-        await this.authService.logout(req.user.userId);
+      const userId = req.user?.userId;
+      if (userId) {
+        await this.authService.logout(userId);
       }
 
       res.clearCookie('refreshToken', {
@@ -93,6 +103,7 @@ export class AuthController {
         sameSite: 'lax',
       });
 
+      logAuthEvent(req, 'auth.logout', userId);
       res.status(200).json(ApiResponse.success('Logged out successfully'));
     } catch (error) {
       next(error);

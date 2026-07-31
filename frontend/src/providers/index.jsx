@@ -1,14 +1,17 @@
 import { ThemeProvider } from './ThemeProvider';
 import { QueryProvider } from './QueryProvider';
+import { AuthProvider } from './AuthContext';
 
 export function AppProviders({ children }) {
   return (
     <ThemeProvider defaultTheme="dark">
       <QueryProvider>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </QueryProvider>
     </ThemeProvider>
   );
 }
 
-export { ThemeProvider, QueryProvider };
+export { ThemeProvider, QueryProvider, AuthProvider };

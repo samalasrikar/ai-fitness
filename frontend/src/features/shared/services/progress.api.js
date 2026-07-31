@@ -1,6 +1,9 @@
 import { apiClient } from '../../../lib/axios';
 
 export const progressApi = {
+  getUnifiedDashboard: async () => {
+    return apiClient.get('/dashboard');
+  },
   getDashboardMetrics: async () => {
     return apiClient.get('/progress/dashboard');
   },

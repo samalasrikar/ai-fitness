@@ -16,6 +16,16 @@ export class ProgressController {
     }
   };
 
+  public getDashboardSummary = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user!.userId;
+      const summary = await this.service.getDashboardSummary(userId);
+      res.status(200).json(ApiResponse.success('Dashboard summary retrieved', summary));
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public toggleChallenge = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user!.userId;

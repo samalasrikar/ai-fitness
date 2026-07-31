@@ -1,9 +1,10 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { env } from './env';
 import { corsOptions } from './config/cors';
+import { requestIdMiddleware } from './middleware/requestId';
 import { requestLogger } from './middleware/requestLogger';
 import { notFound } from './middleware/notFound';
 import { errorHandler } from './middleware/errorHandler';
@@ -16,11 +17,12 @@ import { apiRouter } from './routes';
 export function createApp(): Application {
   const app: Application = express();
 
-  // ── Security Middleware ──────────────────────────────────────────────────
+  // ── Security & Request ID Middleware ────────────────────────────────────
+  app.use(requestIdMiddleware);
   app.use(helmet());
   app.use(cors(corsOptions));
 
-  // ── Body Parsing ─────────────────────────────────────────────────────────
+  // ── Body Parsing & Cookies ───────────────────────────────────────────────
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use(cookieParser(env.COOKIE_SECRET));
