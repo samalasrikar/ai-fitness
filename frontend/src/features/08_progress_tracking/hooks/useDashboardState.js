@@ -4,6 +4,7 @@ import { DEFAULT_USER_PROFILE } from '../constants/dashboardConstants';
 import { useCountUp } from './useCountUp';
 import { useNutritionState } from './useNutritionState';
 import { workoutApi } from '../../../services/api/workout.api';
+import { authApi } from '../../../services/api/auth.api';
 import { aiCoachApi } from '../../shared/services/aicoach.api';
 import { progressApi } from '../../shared/services/progress.api';
 import { profileApi } from '../../shared/services/profile.api';

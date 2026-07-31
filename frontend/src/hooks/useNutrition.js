@@ -22,7 +22,7 @@ export function useNutrition() {
     }
   }, []);
 
-  const logMeal = async (mealData) => {
+  const logMeal = useCallback(async (mealData) => {
     setLoading(true);
     setError(null);
     try {
@@ -36,7 +36,7 @@ export function useNutrition() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchSummary]);
 
   const deleteMeal = async (id) => {
     setError(null);
