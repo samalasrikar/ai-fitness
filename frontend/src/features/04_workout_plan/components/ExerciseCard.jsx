@@ -1,112 +1,78 @@
-/**
- * ExerciseCard – Individual exercise row for YourAIWorkout / FitAIAssistant.
- *
- * ✅ Equal height via min-h
- * ✅ Exercise title readable, truncated with title attr as tooltip
- * ✅ RPE badge never overlaps text (flex-shrink-0)
- * ✅ Long names handled via truncate + min-w-0
- */
-export default function ExerciseCard({ exercise, index, onPress, onSwap }) {
-  const { name, sets, reps, rpe, tag, tagColor, imgSrc, note, extra } = exercise;
+import React from 'react';
+
+export default function ExerciseCard({ exercise, index, onReplace, onToggleComplete, isCompleted }) {
+  const sets = exercise.sets || 3;
+  const reps = exercise.reps || '10';
+  const weight = exercise.weightKg ? `${exercise.weightKg} kg` : null;
+  const rest = exercise.restTimeSec ? `${exercise.restTimeSec}s rest` : '60s rest';
+  const equipment = exercise.equipment || 'Dumbbell';
 
   return (
-    <button
-      type="button"
-      onClick={onPress}
-      aria-label={`View details for ${name}`}
-      className="w-full text-left rounded-xl overflow-hidden
-                 bg-[#201f1f] border border-white/8
-                 hover:border-[#f5c400]/30 transition-all duration-200
-                 active:scale-[0.99] cursor-pointer"
-    >
-      <div className="flex items-center gap-3 p-4 min-h-[72px]">
-        {/* Thumbnail */}
-        {imgSrc && (
-          <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0
-                          border border-white/5 bg-[#131313]">
-            <img
-              className="w-full h-full object-cover"
-              src={imgSrc}
-              alt={name}
-              loading="lazy"
-            />
-          </div>
-        )}
+    <div className={`p-4 rounded-2xl border transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+      isCompleted
+        ? 'bg-primary/10 border-primary/40 shadow-[0_0_15px_rgba(245,196,0,0.1)]'
+        : 'bg-surface-container/90 border-white/10 hover:border-primary/30'
+    }`}>
+      <div className="flex items-center gap-4 flex-1">
+        <button
+          onClick={onToggleComplete}
+          className={`w-9 h-9 rounded-xl flex items-center justify-center border-2 transition-all flex-shrink-0 cursor-pointer ${
+            isCompleted ? 'bg-primary border-primary text-black' : 'border-white/20 hover:border-primary/50 text-white/40'
+          }`}
+          aria-label={isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
+        >
+          {isCompleted ? (
+            <span className="material-symbols-outlined text-base font-black">check</span>
+          ) : (
+            <span className="text-xs font-bold">{index + 1}</span>
+          )}
+        </button>
 
-        {/* Text content – min-w-0 prevents overflow */}
-        <div className="flex-1 min-w-0 space-y-1">
-          {/* Name + tag row */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <h4
-              className="text-sm font-bold text-[#e5e2e1] truncate"
-              title={name}
-            >
-              {name}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h4 className={`text-sm font-extrabold ${isCompleted ? 'line-through text-on-surface-variant' : 'text-white'}`}>
+              {exercise.name}
             </h4>
-            {tag && (
-              <span
-                className={`flex-shrink-0 px-2 py-0.5 rounded text-[10px]
-                             font-bold uppercase tracking-wider
-                             ${tagColor || 'bg-[#f5c400] text-black'}`}
-              >
-                {tag}
+            {exercise.tag && (
+              <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase ${exercise.tagColor || 'bg-primary/20 text-primary border border-primary/30'}`}>
+                {exercise.tag}
               </span>
             )}
           </div>
 
-          {/* Stats row */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <Stat label="Sets" value={sets} />
-            {reps && <Stat label="Reps" value={reps} />}
-            {rpe != null && (
-              <span
-                className="flex-shrink-0 text-[10px] font-bold text-black
-                           bg-[#f5c400] px-1.5 py-0.5 rounded font-[JetBrains_Mono,monospace]"
-              >
-                RPE {rpe}
-              </span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant font-medium">
+            <span className="text-primary font-bold">{sets} Sets</span>
+            <span>•</span>
+            <span>{reps} Reps</span>
+            {weight && (
+              <>
+                <span>•</span>
+                <span className="text-amber-400 font-bold">{weight}</span>
+              </>
             )}
-            {extra && (
-              <span className="text-[10px] text-[#d1c5ab]/60 font-[JetBrains_Mono,monospace]">
-                {extra}
-              </span>
-            )}
+            <span>•</span>
+            <span>{rest}</span>
+            <span>•</span>
+            <span className="bg-white/5 px-2 py-0.5 rounded border border-white/10 text-[10px]">{equipment}</span>
           </div>
 
-          {note && (
-            <p className="text-[10px] text-[#ffba38] font-semibold">{note}</p>
+          {exercise.instructions && (
+            <p className="text-[11px] text-white/60 italic pt-0.5 line-clamp-1">{exercise.instructions}</p>
           )}
         </div>
+      </div>
 
-        {/* Swap button */}
-        {onSwap && (
+      <div className="flex items-center gap-2 self-end md:self-center">
+        {onReplace && (
           <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onSwap(); }}
-            aria-label={`Swap ${name}`}
-            className="flex-shrink-0 w-9 h-9 flex items-center justify-center
-                       rounded-lg text-[#d1c5ab]/40 hover:text-[#f5c400]
-                       hover:bg-[#f5c400]/10 transition-colors"
+            onClick={() => onReplace(exercise)}
+            className="px-3 py-1.5 bg-surface-bright/80 hover:bg-primary/20 border border-white/10 hover:border-primary/40 text-on-surface-variant hover:text-primary text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-lg" aria-hidden="true">
-              swap_horiz
-            </span>
+            <span className="material-symbols-outlined text-sm">swap_horiz</span>
+            Replace
           </button>
         )}
       </div>
-    </button>
-  );
-}
-
-function Stat({ label, value }) {
-  return (
-    <div className="flex items-center gap-1">
-      <span className="text-[11px] font-medium text-[#d1c5ab]/60 uppercase">
-        {label}:
-      </span>
-      <span className="text-[11px] font-bold text-[#f5c400] font-[JetBrains_Mono,monospace]">
-        {value}
-      </span>
     </div>
   );
 }

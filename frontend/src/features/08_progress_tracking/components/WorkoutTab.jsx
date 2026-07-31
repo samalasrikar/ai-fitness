@@ -5,9 +5,13 @@ import ManualWorkoutCreator from '../../04_workout_plan/components/ManualWorkout
 import RestTimerModal from '../../04_workout_plan/components/RestTimerModal';
 import DailyWorkoutPlanner from '../../04_workout_plan/components/DailyWorkoutPlanner';
 
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+const initialDay = DAYS.includes(todayName) ? todayName : 'Monday';
+
 export default function WorkoutTab({ generatedPlan, isGeneratingPlan, handleGeneratePlan }) {
   const navigate = useNavigate();
-  const [activeDay, setActiveDay] = useState('Monday');
+  const [activeDay, setActiveDay] = useState(initialDay);
   const [plan, setPlan] = useState(generatedPlan ? generatedPlan : null);
   const [isLoading, setIsLoading] = useState(!generatedPlan);
   const [completedExercises, setCompletedExercises] = useState({});
@@ -85,6 +89,20 @@ export default function WorkoutTab({ generatedPlan, isGeneratingPlan, handleGene
     }
   };
 
+  const handleClearWorkoutPlan = async () => {
+    try {
+      setIsLoading(true);
+      await workoutApi.resetPlan();
+      setPlan(null);
+      setCompletedExercises({});
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.message ? err.response.data.message : err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleCompleteWorkoutSession = async () => {
     if (!plan) return;
     try {
@@ -143,7 +161,17 @@ export default function WorkoutTab({ generatedPlan, isGeneratingPlan, handleGene
           <span className="text-label-caps text-primary uppercase tracking-[0.2em] font-bold">Daily Workout</span>
           <h2 className="text-lg font-extrabold text-on-surface">Training Planner</h2>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          {plan && (
+            <button
+              onClick={handleClearWorkoutPlan}
+              className="px-2.5 py-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold rounded-xl hover:bg-red-500/20 transition-all flex items-center gap-1 cursor-pointer"
+              title="Clear current workout plan data"
+            >
+              <span className="material-symbols-outlined text-sm">delete_sweep</span>
+              Clear
+            </button>
+          )}
           <button
             onClick={() => setIsManualModalOpen(true)}
             className="px-3 py-1.5 bg-surface-container border border-primary/30 text-primary text-xs font-bold rounded-xl hover:bg-primary/10 transition-all flex items-center gap-1 cursor-pointer"

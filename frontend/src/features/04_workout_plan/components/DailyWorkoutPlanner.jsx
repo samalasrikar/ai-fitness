@@ -1,62 +1,133 @@
-import { useRef, useEffect } from 'react';
+import { useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 /**
- * DaySelector – Horizontally scrollable weekday tab bar.
+ * Computes dynamic date label for a given day of the current week (e.g. "Monday, 31 Jul")
+ */
+function getDateLabel(dayName) {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  // Convert JS day of week (0=Sunday, 1=Monday...6=Saturday) to 0=Monday...6=Sunday
+  const normalizedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const dayIndex = DAYS.indexOf(dayName);
+  if (dayIndex === -1) return dayName;
+
+  const diffDays = dayIndex - normalizedDay;
+  const targetDate = new Date(now);
+  targetDate.setDate(now.getDate() + diffDays);
+
+  const dateNum = targetDate.getDate();
+  const monthName = targetDate.toLocaleDateString('en-US', { month: 'short' });
+  return `${dayName}, ${dateNum} ${monthName}`;
+}
+
+/**
+ * DaySelector – Single centered pill navigation card matching reference UI.
  *
- * ✅ Never clips the last day (pr-4 padding-right)
- * ✅ Auto-scrolls the active day into view on mount and on change
- * ✅ Touch-friendly sizing (min-h-[44px])
- * ✅ Smooth horizontal scroll, no visible scrollbar
+ * ✅ Single centered navigation card (pill shape)
+ * ✅ Shows active day + dynamic date ("Monday, 31 Jul")
+ * ✅ Chevron left / right 44×44 px touch target controls
+ * ✅ Smooth Framer Motion transitions (180ms)
+ * ✅ Keyboard navigation (ArrowLeft / ArrowRight)
+ * ✅ Disables navigation at bounds (Monday / Sunday)
  */
 export default function DaySelector({ activeDay, onSelectDay }) {
-  const containerRef = useRef(null);
-  const activeRef = useRef(null);
+  const currentIndex = DAYS.indexOf(activeDay);
+  const safeIndex = currentIndex === -1 ? 0 : currentIndex;
 
-  // Auto-scroll the active day into the centre of the viewport whenever it changes
-  useEffect(() => {
-    if (activeRef.current) {
-      activeRef.current.scrollIntoView({
-        behavior: 'smooth',
-        inline: 'center',
-        block: 'nearest',
-      });
+  const isFirstDay = safeIndex === 0;
+  const isLastDay = safeIndex === DAYS.length - 1;
+
+  const handlePrev = useCallback(() => {
+    if (!isFirstDay) {
+      onSelectDay(DAYS[safeIndex - 1]);
     }
-  }, [activeDay]);
+  }, [isFirstDay, safeIndex, onSelectDay]);
+
+  const handleNext = useCallback(() => {
+    if (!isLastDay) {
+      onSelectDay(DAYS[safeIndex + 1]);
+    }
+  }, [isLastDay, safeIndex, onSelectDay]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      handlePrev();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      handleNext();
+    }
+  };
+
+  const formattedLabel = getDateLabel(activeDay || DAYS[0]);
 
   return (
-    <div
-      ref={containerRef}
-      role="tablist"
-      aria-label="Select training day"
-      className="flex items-center gap-2 overflow-x-auto scroll-smooth no-scrollbar
-                 px-4 py-1 pr-6"
-      // pr-6 ensures the last tab is never hidden behind scroll shadow
-    >
-      {DAYS.map((day) => {
-        const isActive = activeDay === day;
-        return (
-          <button
-            key={day}
-            role="tab"
-            aria-selected={isActive}
-            ref={isActive ? activeRef : null}
-            onClick={() => onSelectDay(day)}
-            className={`
-              flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold
-              whitespace-nowrap transition-all cursor-pointer
-              min-h-[44px] min-w-[60px]
-              ${isActive
-                ? 'bg-[#f5c400] text-black shadow-[0_0_10px_rgba(245,196,0,0.3)]'
-                : 'bg-[#1a1919] text-[#d1c5ab] hover:text-white border border-white/5 hover:border-[#f5c400]/30'
-              }
-            `}
-          >
-            {day}
-          </button>
-        );
-      })}
+    <div className="w-full flex justify-center py-2 px-1">
+      <div
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        role="region"
+        aria-label="Workout day navigator. Use left and right arrow keys to navigate."
+        className="w-full max-w-[500px] md:w-[80%] sm:w-[90%] h-[68px]
+                   bg-[#161616] border border-[#2A2A2A] rounded-full
+                   flex items-center justify-between px-3 sm:px-4
+                   shadow-[0_4px_20px_rgba(0,0,0,0.4)]
+                   outline-none focus-visible:ring-2 focus-visible:ring-[#f5c400]"
+      >
+        {/* Left Arrow Button */}
+        <button
+          type="button"
+          onClick={handlePrev}
+          disabled={isFirstDay}
+          aria-label="Previous day"
+          className="w-[44px] h-[44px] rounded-full flex items-center justify-center
+                     text-[#d1c5ab] hover:text-[#f5c400] hover:bg-[#f5c400]/10
+                     active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed
+                     disabled:hover:bg-transparent disabled:hover:text-[#d1c5ab]
+                     transition-all duration-200 cursor-pointer flex-shrink-0"
+        >
+          <span className="material-symbols-outlined text-2xl select-none" aria-hidden="true">
+            chevron_left
+          </span>
+        </button>
+
+        {/* Centered Animated Date Label */}
+        <div className="flex-1 min-w-0 text-center overflow-hidden px-2 select-none">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeDay}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+            >
+              <h3 className="text-base sm:text-lg font-extrabold text-white tracking-tight truncate">
+                {formattedLabel}
+              </h3>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Right Arrow Button */}
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={isLastDay}
+          aria-label="Next day"
+          className="w-[44px] h-[44px] rounded-full flex items-center justify-center
+                     text-[#d1c5ab] hover:text-[#f5c400] hover:bg-[#f5c400]/10
+                     active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed
+                     disabled:hover:bg-transparent disabled:hover:text-[#d1c5ab]
+                     transition-all duration-200 cursor-pointer flex-shrink-0"
+        >
+          <span className="material-symbols-outlined text-2xl select-none" aria-hidden="true">
+            chevron_right
+          </span>
+        </button>
+      </div>
     </div>
   );
 }

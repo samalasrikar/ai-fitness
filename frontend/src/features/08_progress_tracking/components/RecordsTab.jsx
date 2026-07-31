@@ -25,8 +25,10 @@ export default function RecordsTab() {
     setError(null);
     try {
       const res = await progressApi.getRecordsSummary();
-      if (res.data) setSummary(res.data);
+      const summaryData = res.data?.data || res.data;
+      if (summaryData) setSummary(summaryData);
     } catch (err) {
+      console.error(err);
       setError('Could not load records summary. Please try again.');
     } finally {
       setIsLoading(false);
@@ -46,7 +48,7 @@ export default function RecordsTab() {
         exerciseName: newExercise.trim(),
         recordValue: Number(newValue),
         unit: newUnit,
-        category: 'Strength'
+        category: 'Strength',
       });
       setShowAddPrModal(false);
       setNewExercise('');
@@ -80,7 +82,7 @@ export default function RecordsTab() {
       <div className="flex flex-col items-center justify-center h-[60vh] text-center p-6 space-y-4">
         <span className="material-symbols-outlined text-red-400 text-4xl">error_outline</span>
         <p className="text-sm font-bold text-red-400">Failed to load records</p>
-        <button onClick={fetchRecords} className="px-4 py-2 bg-primary text-black font-bold text-xs uppercase rounded-xl">
+        <button onClick={fetchRecords} className="px-4 py-2 bg-primary text-black font-bold text-xs uppercase rounded-xl cursor-pointer">
           Retry
         </button>
       </div>
@@ -99,7 +101,7 @@ export default function RecordsTab() {
     : recordsList.filter((r) => r.category?.toLowerCase() === categoryFilter.toLowerCase());
 
   return (
-    <div className="flex flex-col w-full max-w-[430px] mx-auto px-6 space-y-6 pt-4 pb-24 animate-in fade-in duration-300">
+    <div className="flex flex-col w-full max-w-5xl mx-auto px-4 sm:px-6 space-y-6 pt-4 pb-24 animate-in fade-in duration-300">
       {/* Title Header */}
       <header className="space-y-1">
         <span className="text-label-caps text-primary uppercase tracking-[0.2em] font-bold">Performance Lab</span>
@@ -118,11 +120,11 @@ export default function RecordsTab() {
       {/* AI Performance Insights Card */}
       <AIInsightCard insights={insightsList} />
 
-      {/* Streak & Consistency Analytics */}
-      <StreakCard streak={streak} />
-
-      {/* Monthly Volume Progression Chart */}
-      <ProgressChart chartData={chartData} />
+      {/* Streak & Volume Charts Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <StreakCard streak={streak} />
+        <ProgressChart chartData={chartData} />
+      </div>
 
       {/* Personal Best Records Section */}
       <section className="space-y-4">
@@ -134,7 +136,7 @@ export default function RecordsTab() {
         </div>
 
         {/* Category Tabs */}
-        <div className="flex gap-2 bg-[#121212] p-1 rounded-xl border border-white/5 text-[10px] font-bold">
+        <div className="flex gap-2 bg-[#121212] p-1 rounded-xl border border-white/5 text-[10px] font-bold max-w-xs">
           {['All', 'Strength', 'Bodyweight'].map((cat) => (
             <button
               key={cat}
@@ -154,7 +156,7 @@ export default function RecordsTab() {
             <p className="text-xs text-on-surface-variant font-medium">No personal records in this category.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filteredRecords.map((record) => (
               <PersonalRecordCard key={record.id} record={record} onDelete={handleDeletePr} />
             ))}
@@ -162,25 +164,28 @@ export default function RecordsTab() {
         )}
       </section>
 
-      {/* Milestones Section */}
-      <section className="space-y-3">
-        <h3 className="text-label-caps text-on-surface uppercase tracking-wider font-extrabold">Active Milestones</h3>
-        <div className="space-y-3">
-          {milestonesList.map((m) => (
-            <MilestoneCard key={m.id} milestone={m} />
-          ))}
-        </div>
-      </section>
+      {/* Milestones & Achievements Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Milestones Section */}
+        <section className="space-y-3">
+          <h3 className="text-label-caps text-on-surface uppercase tracking-wider font-extrabold">Active Milestones</h3>
+          <div className="space-y-3">
+            {milestonesList.map((m) => (
+              <MilestoneCard key={m.id} milestone={m} />
+            ))}
+          </div>
+        </section>
 
-      {/* Achievement Vault */}
-      <section className="space-y-3">
-        <h3 className="text-label-caps text-on-surface uppercase tracking-wider font-extrabold">Achievement Vault</h3>
-        <div className="space-y-3">
-          {achievementsList.map((ach) => (
-            <AchievementCard key={ach.id} achievement={ach} />
-          ))}
-        </div>
-      </section>
+        {/* Achievement Vault */}
+        <section className="space-y-3">
+          <h3 className="text-label-caps text-on-surface uppercase tracking-wider font-extrabold">Achievement Vault</h3>
+          <div className="space-y-3">
+            {achievementsList.map((ach) => (
+              <AchievementCard key={ach.id} achievement={ach} />
+            ))}
+          </div>
+        </section>
+      </div>
 
       {/* Log New PR Modal */}
       {showAddPrModal && (
@@ -188,7 +193,7 @@ export default function RecordsTab() {
           <div className="bg-[#161616] w-full max-w-sm rounded-2xl border border-white/10 p-5 space-y-4">
             <div className="flex justify-between items-center border-b border-white/10 pb-3">
               <h3 className="text-sm font-extrabold text-white">Log New Personal Record</h3>
-              <button onClick={() => setShowAddPrModal(false)} className="text-on-surface-variant hover:text-white p-1">
+              <button onClick={() => setShowAddPrModal(false)} className="text-on-surface-variant hover:text-white p-1 cursor-pointer">
                 <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>

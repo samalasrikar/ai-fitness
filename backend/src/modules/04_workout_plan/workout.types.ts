@@ -2,7 +2,13 @@ export interface ExerciseItem {
   name: string;
   sets: number | string;
   reps?: string;
+  weightKg?: number;
+  restTimeSec?: number;
+  equipment?: string;
+  targetMuscle?: string;
   rpe?: number | string;
+  tempo?: string;
+  instructions?: string;
   extra?: string;
   tag?: string | null;
   tagColor?: string;
@@ -15,10 +21,13 @@ export interface WorkoutPlan {
   id?: string;
   userId?: string;
   title: string;
+  muscleGroup?: string;
   duration: string;
+  estimatedCalories?: number;
   exercises: ExerciseItem[];
   isActive?: boolean;
   createdAt?: Date;
+  dayName?: string;
 }
 
 export interface SessionSet {
@@ -81,4 +90,59 @@ export interface CreateTemplateInput {
   estimatedDurationMin?: number;
   difficulty?: string;
   exercises: ExerciseItem[];
+}
+
+export interface AIGenerateWorkoutInput {
+  goal: string;
+  targetMuscle: string;
+  experience: string;
+  workoutDuration: number | string;
+  equipment: string[];
+  trainingStyle?: string;
+  intensity?: string;
+  injuries?: string;
+}
+
+export interface ReplaceExerciseInput {
+  currentExerciseName: string;
+  targetMuscle?: string;
+  equipment?: string;
+  difficulty?: string;
+  searchQuery?: string;
+}
+
+export interface ExerciseAlternative {
+  id: string;
+  name: string;
+  targetMuscle: string;
+  equipment: string;
+  difficulty: string;
+  matchScore: number;
+  reason: string;
+  imgSrc?: string;
+}
+
+export interface AIRecommendation {
+  id: string;
+  title: string;
+  type: string;
+  reason: string;
+  recommendedAction: string;
+  priority: 'High' | 'Medium' | 'Low';
+  createdAt?: string;
+}
+
+export interface WeeklyAnalytics {
+  workoutDays: number;
+  workoutTimeMin: number;
+  totalCalories: number;
+  totalVolumeKg: number;
+  exercisesCompleted: number;
+  frequencyData: { day: string; sessions: number }[];
+  durationData: { day: string; minutes: number }[];
+  muscleDistribution: { name: string; percentage: number }[];
+  volumeTrend: { date: string; volume: number }[];
+  completionPercentage: number;
+  consistencyScore: number;
+  personalRecords: { exercise: string; record: string; date: string }[];
 }
