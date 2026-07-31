@@ -7,6 +7,7 @@ import { env } from '../env';
 // ─────────────────────────────────────────────────────────────────────────────
 // Global Error Handler Middleware
 // Must be registered last in the middleware chain
+// Suppresses stack traces for expected operational & authentication failures (4xx)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function errorHandler(
@@ -15,17 +16,27 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
-  // Log the error
-  logger.error(`[ErrorHandler] ${error.message}`, {
-    url: req.originalUrl,
-    method: req.method,
-    stack: env.IS_DEVELOPMENT ? error.stack : undefined,
-  });
+  const isApiError = error instanceof ApiError;
+  const statusCode = isApiError ? (error as ApiError).statusCode : 500;
+
+  // Log level & stack trace policy:
+  // Expected operational / auth errors (4xx) -> WARN level without stack traces
+  // Server/Unexpected errors (5xx) -> ERROR level with stack trace in development
+  if (isApiError && statusCode < 500) {
+    logger.warn(`[${req.method} ${req.originalUrl}] ${error.message} (${statusCode})`);
+  } else {
+    logger.error(`[ErrorHandler] ${error.message}`, {
+      url: req.originalUrl,
+      method: req.method,
+      statusCode,
+      stack: env.IS_DEVELOPMENT ? error.stack : undefined,
+    });
+  }
 
   // Handle known ApiErrors
-  if (error instanceof ApiError) {
-    res.status(error.statusCode).json(
-      ApiResponse.error(error.message, error.statusCode, error.errors),
+  if (isApiError) {
+    res.status(statusCode).json(
+      ApiResponse.error(error.message, statusCode, (error as ApiError).errors),
     );
     return;
   }

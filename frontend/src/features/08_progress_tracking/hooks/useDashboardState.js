@@ -6,7 +6,6 @@ import { useNutritionState } from './useNutritionState';
 import { workoutApi } from '../../../services/api/workout.api';
 import { aiCoachApi } from '../../shared/services/aicoach.api';
 import { progressApi } from '../../shared/services/progress.api';
-import { authApi } from '../../shared/services/auth.api';
 import { profileApi } from '../../shared/services/profile.api';
 
 export function useDashboardState() {
@@ -15,7 +14,7 @@ export function useDashboardState() {
   const [hasJoinedChallenge, setHasJoinedChallenge] = useState(false);
   const [streakDays, setStreakDays] = useState(0);
 
-  // Profile state — start from localStorage cache, hydrate from API
+  // Profile state — start from localStorage cache, hydrate from unified API
   const [userProfile, setUserProfile] = useState(() => {
     try {
       const saved = localStorage.getItem('userProfile');
@@ -24,27 +23,49 @@ export function useDashboardState() {
     return DEFAULT_USER_PROFILE;
   });
 
+  // Single Unified Dashboard fetch on mount (Requirement 8)
   useEffect(() => {
     let isMounted = true;
-    profileApi.getProfile()
+
+    progressApi.getUnifiedDashboard()
       .then((res) => {
         if (!isMounted || !res.data) return;
-        const p = res.data;
-        const merged = {
-          displayName: p.displayName || `${p.firstName || ''} ${p.lastName || ''}`.trim() || userProfile.displayName,
-          username: p.username || userProfile.username || `@${(p.firstName || 'user').toLowerCase()}_fit`,
-          fitnessLevel: p.fitnessLevel || userProfile.fitnessLevel,
-          weight: p.weight ?? userProfile.weight,
-          heightFt: p.heightFt ?? userProfile.heightFt,
-          heightIn: p.heightIn ?? userProfile.heightIn,
-          age: p.age ?? userProfile.age,
-          gender: p.gender || userProfile.gender
-        };
-        setUserProfile(merged);
-        localStorage.setItem('userProfile', JSON.stringify(merged));
+        const d = res.data;
+
+        if (d.profile) {
+          const p = d.profile;
+          const merged = {
+            displayName: p.displayName || userProfile.displayName,
+            username: p.username || userProfile.username,
+            fitnessLevel: p.fitnessLevel || userProfile.fitnessLevel,
+            weight: p.weight ?? userProfile.weight,
+            heightFt: p.heightFt ?? userProfile.heightFt,
+            heightIn: p.heightIn ?? userProfile.heightIn,
+            age: p.age ?? userProfile.age,
+            gender: p.gender || userProfile.gender,
+          };
+          setUserProfile(merged);
+          try { localStorage.setItem('userProfile', JSON.stringify(merged)); } catch (e) {}
+        }
+
+        if (d.activeWorkout) {
+          setGeneratedPlan(d.activeWorkout);
+        }
+
+        if (d.progress) {
+          setHasJoinedChallenge(Boolean(d.progress.hasJoinedChallenge));
+          setStreakDays(d.progress.activeStreak ?? d.progress.streakDays ?? 0);
+        }
+
+        if (d.coachHistory && d.coachHistory.length > 0) {
+          setChatMessages(d.coachHistory);
+        }
       })
       .catch(() => {});
-    return () => { isMounted = false; };
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const firstName = userProfile.displayName
@@ -71,44 +92,12 @@ export function useDashboardState() {
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState(null);
 
-  // Fetch active workout plan on mount
-  useEffect(() => {
-    let isMounted = true;
-    workoutApi.getActivePlan()
-      .then(res => { if (isMounted && res.data) setGeneratedPlan(res.data); })
-      .catch(() => {});
-    return () => { isMounted = false; };
-  }, []);
-
-  // Fetch dashboard progress metrics & challenge/streak status on mount
-  useEffect(() => {
-    let isMounted = true;
-    progressApi.getDashboardMetrics()
-      .then(res => {
-        if (!isMounted || !res.data) return;
-        setHasJoinedChallenge(Boolean(res.data.hasJoinedChallenge));
-        setStreakDays(res.data.activeStreak ?? res.data.streakDays ?? 0);
-      })
-      .catch(() => {});
-    return () => { isMounted = false; };
-  }, []);
-
   // AI Coach chat state
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     { sender: 'coach', text: `Hey! Ready to crush your goals today? Let me know if you want me to generate a personalized routine or review your stats.` }
   ]);
   const [inputMessage, setInputMessage] = useState('');
-
-  useEffect(() => {
-    let isMounted = true;
-    aiCoachApi.getHistory()
-      .then(res => {
-        if (isMounted && res.data && res.data.length > 0) setChatMessages(res.data);
-      })
-      .catch(() => {});
-    return () => { isMounted = false; };
-  }, []);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -222,9 +211,10 @@ export function useDashboardState() {
   const handleSecureLogout = async () => {
     setLogoutState('securing');
     try { await authApi.logout(); } catch {}
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userProfile');
+    try {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userProfile');
+    } catch (e) {}
     setLogoutState('closed');
     const t = setTimeout(() => { navigate('/login'); setLogoutState('idle'); }, 1000);
     addTimer(t);

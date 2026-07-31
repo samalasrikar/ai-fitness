@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt, { Secret } from 'jsonwebtoken';
+import jwt, { Secret, SignOptions, VerifyOptions } from 'jsonwebtoken';
 import { AuthRepository } from './auth.repository';
 import {
   RegisterDTO,
@@ -13,9 +13,12 @@ import {
 import { ApiError } from '../../utils/ApiError';
 import { env } from '../../env';
 
+const JWT_ISSUER = 'fitai-x';
+const JWT_AUDIENCE = 'fitai-x-app';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Auth Service – Business Logic Layer
-// Encapsulates authentication, token generation, security rules & hashing
+// Encapsulates authentication, token generation, token rotation & reuse detection
 // ─────────────────────────────────────────────────────────────────────────────
 
 export class AuthService {
@@ -46,18 +49,8 @@ export class AuthService {
       lastName: dto.lastName,
     });
 
-    // Generate tokens
-    const tokens = this.generateTokens({
-      id: user.id,
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    // Store refresh token hash in DB
-    const refreshTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-    await this.repository.saveRefreshToken(user.id, refreshTokenHash, expiresAt);
+    // Generate token pair with initial family ID
+    const { tokens } = await this.issueTokenPair(user);
 
     return {
       user: this.mapToUserResponseDTO(user),
@@ -80,18 +73,8 @@ export class AuthService {
       throw ApiError.unauthorized('Invalid email address or password');
     }
 
-    // Generate tokens
-    const tokens = this.generateTokens({
-      id: user.id,
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    // Save refresh token hash in database
-    const refreshTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await this.repository.saveRefreshToken(user.id, refreshTokenHash, expiresAt);
+    // Issue new token pair
+    const { tokens } = await this.issueTokenPair(user);
 
     return {
       user: this.mapToUserResponseDTO(user),
@@ -100,32 +83,61 @@ export class AuthService {
   }
 
   /**
-   * Refreshes access token given a valid refresh token
+   * Refreshes access token with Secure Token Rotation & Reuse Detection
    */
-  public async refreshToken(refreshToken: string): Promise<AuthTokens> {
-    if (!refreshToken) {
+  public async refreshToken(rawRefreshToken: string): Promise<AuthTokens> {
+    if (!rawRefreshToken) {
       throw ApiError.unauthorized('Refresh token is required');
     }
 
+    let decoded: TokenPayload;
     try {
-      const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET as Secret) as TokenPayload;
-      const user = await this.repository.findById(decoded.userId);
-      if (!user) {
-        throw ApiError.unauthorized('User associated with token no longer exists');
-      }
-
-      // Generate new tokens (token rotation)
-      const newTokens = this.generateTokens({
-        id: user.id,
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-      });
-
-      return newTokens;
+      const verifyOpts: VerifyOptions = {
+        algorithms: ['HS256'],
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE,
+      };
+      decoded = jwt.verify(rawRefreshToken, env.JWT_REFRESH_SECRET as Secret, verifyOpts) as TokenPayload;
     } catch {
       throw ApiError.unauthorized('Invalid or expired refresh token');
     }
+
+    // Check database record for token rotation / reuse detection
+    const storedToken = await this.repository.findRefreshToken(rawRefreshToken);
+    if (!storedToken) {
+      throw ApiError.unauthorized('Invalid or unrecognised refresh token');
+    }
+
+    // ── REUSE DETECTION ──────────────────────────────────────────────────────
+    if (storedToken.isRevoked) {
+      // Security Incident! An already revoked token was presented again.
+      // Immediately revoke all tokens in this family (containment)
+      if (storedToken.familyId) {
+        await this.repository.revokeTokenFamily(storedToken.familyId);
+      } else {
+        await this.repository.deleteRefreshTokensByUserId(storedToken.userId);
+      }
+      throw ApiError.unauthorized('Token reuse detected. All active sessions have been revoked.');
+    }
+
+    // Check expiration in DB
+    if (new Date() > storedToken.expiresAt) {
+      await this.repository.revokeRefreshToken(storedToken.id);
+      throw ApiError.unauthorized('Refresh token has expired');
+    }
+
+    const user = await this.repository.findById(decoded.userId);
+    if (!user) {
+      throw ApiError.unauthorized('User associated with token no longer exists');
+    }
+
+    // Revoke current refresh token (rotation step 1)
+    await this.repository.revokeRefreshToken(storedToken.id);
+
+    // Issue new refresh token & access token in same family (rotation step 2)
+    const { tokens } = await this.issueTokenPair(user, storedToken.familyId || undefined);
+
+    return tokens;
   }
 
   /**
@@ -147,18 +159,39 @@ export class AuthService {
   }
 
   /**
-   * Helper to sign JWT access and refresh tokens
+   * Helper to issue access + refresh token pair and persist hashed token to DB
    */
-  private generateTokens(payload: TokenPayload): AuthTokens {
+  private async issueTokenPair(user: UserEntity, existingFamilyId?: string): Promise<{ tokens: AuthTokens; familyId: string }> {
+    const payload: TokenPayload = {
+      id: user.id,
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    const signOpts: SignOptions = {
+      algorithm: 'HS256',
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
+    };
+
     const accessToken = jwt.sign(payload, env.JWT_ACCESS_SECRET as Secret, {
+      ...signOpts,
       expiresIn: env.JWT_ACCESS_EXPIRES_IN as any,
     });
 
     const refreshToken = jwt.sign(payload, env.JWT_REFRESH_SECRET as Secret, {
+      ...signOpts,
       expiresIn: env.JWT_REFRESH_EXPIRES_IN as any,
     });
 
-    return { accessToken, refreshToken };
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const saved = await this.repository.saveRefreshToken(user.id, refreshToken, expiresAt, existingFamilyId);
+
+    return {
+      tokens: { accessToken, refreshToken },
+      familyId: saved.familyId,
+    };
   }
 
   /**

@@ -44,9 +44,14 @@ export async function checkDatabaseConnection(): Promise<void> {
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         token_hash VARCHAR(255) NOT NULL,
+        family_id UUID,
+        is_revoked BOOLEAN NOT NULL DEFAULT false,
         expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+      ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS family_id UUID;
+      ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS is_revoked BOOLEAN DEFAULT false;
 
       CREATE TABLE IF NOT EXISTS user_profiles (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -9,6 +9,18 @@ export class ProgressService {
     return this.repo.getMetrics(userId);
   }
 
+  public async getDashboardSummary(userId: string) {
+    const [metrics, personalRecords] = await Promise.all([
+      this.repo.getMetrics(userId),
+      this.repo.getPersonalRecords(userId),
+    ]);
+
+    return {
+      metrics,
+      personalRecords,
+    };
+  }
+
   public async toggleChallenge(userId: string): Promise<{ hasJoinedChallenge: boolean }> {
     const hasJoinedChallenge = await this.repo.toggleChallenge(userId);
     return { hasJoinedChallenge };

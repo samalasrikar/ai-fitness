@@ -8,6 +8,7 @@ const controller = new ProgressController();
 router.use(authenticate);
 
 router.get('/dashboard', controller.getMetrics);
+router.get('/dashboard-summary', controller.getDashboardSummary);
 router.post('/challenge/toggle', controller.toggleChallenge);
 
 router.get('/records/summary', controller.getRecordsSummary);

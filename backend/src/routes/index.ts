@@ -12,6 +12,7 @@ import { analyticsRouter } from '../modules/09_analytics';
 import { notificationRouter } from '../modules/12_notifications';
 
 import { aiRouter } from './v1/ai';
+import { dashboardRouter } from './v1/dashboard';
 
 const router = Router();
 
@@ -19,6 +20,7 @@ const router = Router();
 router.use('/health', healthRouter);
 router.use('/ai', aiRouter);
 router.use('/auth', authRouter);
+router.use('/dashboard', dashboardRouter);
 router.use('/profile', profileRouter);
 router.use('/onboarding', onboardingRouter);
 router.use('/workouts', workoutRouter);
